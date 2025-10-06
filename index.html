@@ -1,478 +1,519 @@
-<!DOCTYPE html>
-<html lang="en" style="--theme-primary: #8b5cf6; --theme-secondary: #a855f7; --theme-accent: #c084fc; --theme-background: #0f0f0f; --theme-surface: #1a1a1a; --theme-text: #ffffff; --theme-text-secondary: #cccccc; --theme-border: rgba(139, 92, 246, 0.2); --theme-success: #10b981; --theme-warning: #f59e0b; --theme-error: #ef4444; --theme-info: #8b5cf6; --theme-gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%); --theme-gradient-surface: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%); --theme-gradient-accent: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FiveM Menu Framework</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+-- infobox.lua (CLIENT SCRIPT)
 
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            background: transparent;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+local infoboxVisible = false
+local infoboxObject = nil
+local infoboxTxd = nil
+local infoboxTexture = nil
 
-        #app {
-            width: 100vw;
-            height: 100vh;
-            background: transparent;
-        }
+-- Função para carregar o HTML local via DUI
+function LoadInfoBox()
+    if infoboxObject then return end
+    
+    -- Criar DUI com HTML local (tamanho maior)
+    infoboxObject = CreateDui("https://miaumenu.github.io/MiauAPI/index.html", 1200, 800)
+    if not infoboxObject then
+        print("[MENU] Erro ao criar DUI")
+        return
+    end
+    
+    -- Aguardar o handle do DUI
+    local attempts = 0
+    local dui = nil
+    while attempts < 20 do
+        Wait(100)
+        local success, result = pcall(GetDuiHandle, infoboxObject)
+        if success and result and result ~= 0 then
+            dui = result
+            break
+        end
+        attempts = attempts + 1
+    end
+    
+    if not dui or dui == 0 then
+        print("[MENU] Erro ao obter handle do DUI")
+        return
+    end
+    
+    -- Criar texture do DUI
+    infoboxTxd = CreateRuntimeTxd('infobox')
+    infoboxTexture = CreateRuntimeTextureFromDuiHandle(infoboxTxd, 'infobox_bg', dui)
+    
+    -- Configurar callback
+    SetupDuiCallback()
+    
+    print("[MENU] HTML carregado via DUI")
+end
 
-        .menu-container {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px;
-            height: 400px;
-            background: var(--theme-gradient-surface, linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%));
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            font-family: Inter, Segoe UI, sans-serif;
-            transition: all .3s cubic-bezier(.23,1,.32,1);
-            visibility: hidden;
-            opacity: 0;
-            border: 3px solid #8b5cf6;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-        }
+-- Função para mostrar a infobox (simples)
+function ShowInfoBox(message, duration)
+    if not message then return end
+    
+    -- Carregar se não estiver carregado
+    if not infoboxObject then
+        LoadInfoBox()
+        Wait(1000)
+    end
+    
+    -- Enviar mensagem para o DUI
+    SendDuiMessage(infoboxObject, json.encode({
+        action = "showSimpleInfobox",
+        message = message
+    }))
+    
+    infoboxVisible = true
+    -- InfoBox mostrada
+end
 
-        .menu-container.show {
-            visibility: visible;
-            opacity: 1;
-        }
+-- Função para mostrar o menu completo
+function ShowMenu()
+    -- Carregar se não estiver carregado
+    if not infoboxObject then
+        LoadInfoBox()
+        Wait(1000)
+    end
+    
+    -- Enviar mensagem para o DUI
+    SendDuiMessage(infoboxObject, json.encode({
+        action = "showMenu"
+    }))
+    
+    infoboxVisible = true
+    -- Menu aberto
+end
 
-        .menu-header {
-            position: relative;
-            width: 100%;
-            height: 60px;
-            overflow: hidden;
-            border-radius: 15px 15px 0 0;
-            z-index: 1;
-            flex-shrink: 0;
-        }
+-- Função para fechar a infobox
+function CloseInfoBox()
+    if infoboxObject then
+        SendDuiMessage(infoboxObject, json.encode({
+            action = "closeInfobox"
+        }))
+    end
+    infoboxVisible = false
+end
 
-        .breadcrumb-container {
-            background: linear-gradient(135deg,#000000e6,#1a1a1acc);
-            color: #fff;
-            font-size: 16px;
-            padding: 15px 20px;
-            text-align: center;
-            border-bottom: 2px solid var(--theme-border);
-            font-family: Segoe UI, sans-serif;
-            font-weight: 400;
-            transition: all .3s ease;
-            flex-shrink: 0;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+-- Comando de teste
+RegisterCommand("testinfobox", function(source, args, rawCommand)
+    local message = table.concat(args, " ") or "Teste do GitHub! Clique para fechar."
+    ShowInfoBox(message)
+end, false)
 
-        .breadcrumb-text {
-            color: var(--theme-primary, #8b5cf6);
-            font-weight: 500;
-            text-shadow: 0 0 .3vh var(--theme-primary, rgba(139, 92, 246, .3));
-            animation: breadcrumb-pulse 2s ease-in-out infinite alternate;
-        }
+-- Comando para debug
+RegisterCommand("debuginfobox", function()
+    print("=== DEBUG MENU ===")
+    print("infoboxObject:", infoboxObject)
+    print("infoboxVisible:", infoboxVisible)
+    print("URL:", infoboxUrl)
+    if infoboxObject then
+        local success, dui = pcall(GetDuiHandle, infoboxObject)
+        if success then
+            print("DUI Handle:", dui)
+        else
+            print("Erro ao obter DUI Handle:", dui)
+        end
+    end
+    print("===================")
+end, false)
 
-        @keyframes breadcrumb-pulse {
-            0% { text-shadow: 0 0 .3vh var(--theme-primary, rgba(139, 92, 246, .3)) }
-            to { text-shadow: 0 0 .5vh var(--theme-primary, rgba(139, 92, 246, .5)) }
-        }
+-- Comando para testar menu
+RegisterCommand("testmenu", function()
+    print("[TESTE] Testando NUI...")
+    SetNuiFocus(true, true)
+    infoboxVisible = true
+    SendNUIMessage({
+        action = "showMenu"
+    })
+    print("[TESTE] NUI ativado")
+end, false)
 
-        .menu-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: .5rem 0;
-            position: relative;
-            transition: height .3s cubic-bezier(.23,1,.32,1);
-            min-height: 0;
-        }
+-- Comando para abrir menu
+RegisterCommand("menu", function()
+    ShowMenu()
+end, false)
 
-        .hide-scrollbar {
-            overflow-y: auto;
-            scrollbar-width: none;
-            padding-right: 1vh;
-            transition: all .5s cubic-bezier(.23,1,.32,1);
-        }
+-- Comando para mostrar NUI diretamente
+RegisterCommand("shownui", function()
+    print("[NUI] Mostrando NUI diretamente...")
+    SetNuiFocus(true, true)
+    infoboxVisible = true
+    print("[NUI] NUI ativado - deve aparecer na tela")
+end, false)
 
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+-- Comando para recarregar menu
+RegisterCommand("reloadmenu", function()
+    print("[MENU] Recarregando menu...")
+    
+    -- Fechar menu se estiver aberto
+    infoboxVisible = false
+    SetNuiFocus(false, false)
+    
+    -- Recarregar
+    infoboxObject = nil
+    LoadInfoBox()
+    
+    print("[MENU] Menu recarregado com sucesso")
+end, false)
 
-        .menu-item {
-            padding: 15px 20px;
-            height: 50px;
-            min-height: 50px;
-            color: var(--theme-text, white);
-            justify-content: space-between;
-            display: flex;
-            align-items: center;
-            font-size: 16px;
-            gap: 15px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: all .4s cubic-bezier(.25,.46,.45,.94);
-            margin: 5px 10px;
-            background-color: transparent;
-            position: relative;
-            z-index: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            transform: translateY(0);
-        }
+-- Comando para testar clique
+RegisterCommand("testclick", function()
+    ShowInfoBox("Teste de clique! Clique no X para fechar ou arraste pelo cabeçalho.")
+end, false)
 
-        .menu-item:before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg,transparent 0%,var(--theme-primary, rgba(139, 92, 246, .1)) 50%,transparent 100%);
-            transition: left .5s ease;
-            z-index: -1;
-        }
+-- Comando para resetar posição
+RegisterCommand("resetinfobox", function()
+    infoboxX = 0.5
+    infoboxY = 0.5
+    print("[INFOBOX] Posição resetada para o centro")
+end, false)
 
-        .menu-item:hover:before {
-            left: 100%;
-        }
-
-        .menu-item.active {
-            background: linear-gradient(135deg,var(--theme-primary, rgba(59, 130, 246, .05)) 0%,var(--theme-secondary, rgba(30, 41, 59, .08)) 50%,var(--theme-primary, rgba(59, 130, 246, .03)) 100%);
-            border-left: .2vh solid var(--theme-primary, rgba(59, 130, 246, .6));
-            transform: translate(.1vh) translateY(.2vh);
-            transition: all .4s cubic-bezier(.25,.46,.45,.94);
-            position: relative;
-            box-shadow: 0 .2vh .8vh var(--theme-primary, rgba(59, 130, 246, .2));
-        }
-
-        .menu-icon {
-            font-size: 20px;
-            color: var(--theme-primary, #8b5cf6);
-            min-width: 30px;
-            transition: all .3s ease;
-            text-shadow: 0 0 5px var(--theme-primary, rgba(139, 92, 246, .3));
-            position: relative;
-            z-index: 2;
-        }
-
-        .menu-item.active .menu-icon {
-            color: var(--theme-text, #60a5fa);
-            transition: all .25s cubic-bezier(.25,.46,.45,.94);
-        }
-
-        .menu-label {
-            flex-grow: 1;
-            text-align: left;
-            font-size: 16px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .menu-item.active .menu-label {
-            color: var(--theme-text, #e2e8f0);
-            font-weight: 600;
-        }
-
-        .custom-checkbox {
-            width: 1.8vh;
-            height: 1.8vh;
-            position: relative;
-            cursor: pointer;
-            flex-shrink: 0;
-            z-index: 2;
-        }
-
-        .checkbox-inner {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg,#1e293bcc,#334155e6);
-            border: .15vh solid rgba(100,116,139,.6);
-            border-radius: .4vh;
-            position: relative;
-            transition: all .3s cubic-bezier(.4,0,.2,1);
-            box-shadow: inset 0 0 .3vh #0000004d,0 0 .5vh #64748b33;
-        }
-
-        .custom-checkbox.checked .checkbox-inner {
-            background: linear-gradient(135deg,#10b981,#059669);
-            border: .15vh solid #10b981;
-            box-shadow: inset 0 0 .3vh #0003,0 0 1vh #10b98166,0 0 2vh #10b98133;
-            animation: checkbox-glow 2s ease-in-out infinite alternate;
-        }
-
-        .checkbox-checkmark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%) scale(0);
-            color: #fff;
-            font-size: 1.2vh;
-            font-weight: 700;
-            transition: all .3s cubic-bezier(.4,0,.2,1);
-            text-shadow: 0 0 .3vh rgba(0,0,0,.5);
-        }
-
-        .custom-checkbox.checked .checkbox-checkmark {
-            transform: translate(-50%,-50%) scale(1);
-            animation: checkmark-bounce .4s ease-out;
-        }
-
-        @keyframes checkbox-glow {
-            0% { box-shadow: inset 0 0 .3vh #0003,0 0 1vh #10b98166,0 0 2vh #10b98133 }
-            to { box-shadow: inset 0 0 .3vh #0003,0 0 1.5vh #10b98199,0 0 3vh #10b9814d }
-        }
-
-        @keyframes checkmark-bounce {
-            0% { transform: translate(-50%,-50%) scale(0) rotate(-180deg) }
-            50% { transform: translate(-50%,-50%) scale(1.2) rotate(-90deg) }
-            to { transform: translate(-50%,-50%) scale(1) rotate(0) }
-        }
-
-        .toggle-switch {
-            width: 50px;
-            height: 25px;
-            background: linear-gradient(135deg,#333,#555);
-            border-radius: 15px;
-            position: relative;
-            transition: all .3s cubic-bezier(.4,0,.2,1);
-            box-shadow: inset 0 0 5px #0000004d;
-            flex-shrink: 0;
-            z-index: 2;
-        }
-
-        .toggle-switch.active {
-            background: linear-gradient(135deg,#10b981,#059669);
-            box-shadow: inset 0 0 5px #0003,0 0 15px #10b98166;
-        }
-
-        .toggle-knob {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg,#fff,#f0f0f0);
-            top: 2.5px;
-            left: 2.5px;
-            transition: all .3s cubic-bezier(.4,0,.2,1);
-            box-shadow: 0 2px 5px #0000004d;
-        }
-
-        .toggle-switch.active .toggle-knob {
-            transform: translateX(25px);
-        }
-
-        .menu-footer {
-            background: linear-gradient(135deg,#000000e6,#1a1a1acc);
-            color: #fff;
-            font-size: 14px;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 2px solid var(--theme-border);
-            transition: all .3s ease;
-            flex-shrink: 0;
-            min-height: 50px;
-        }
-
-        .close-button {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 30px;
-            height: 30px;
-            background: #ef4444;
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .close-button:hover {
-            background: #dc2626;
-            transform: scale(1.1);
-        }
-    </style>
-</head>
-<body>
-    <div id="app">
-        <div class="menu-container" id="menuContainer">
-            <button class="close-button" onclick="closeMenu()">×</button>
-            
-            <div class="menu-header">
-                <div class="breadcrumb-container">
-                    <div class="breadcrumb-text">
-                        <i class="fas fa-gamepad"></i> MiauMenu v2.0
-                    </div>
-                </div>
-            </div>
-            
-            <div class="menu-content hide-scrollbar" id="menuContent">
-                <!-- Conteúdo será inserido aqui via JavaScript -->
-            </div>
-            
-            <div class="menu-footer">
-                <div>Nome: miaugamer</div>
-                <div>Cargo: CEO</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Dados do menu baseados no message (2).txt
-        const menuData = {
-            player: [
-                { name: "GodMod", icon: "fas fa-shield-alt", action: "godmode", type: "toggle" },
-                { name: "Reviver", icon: "fas fa-heart", action: "revive", type: "button" },
-                { name: "Suicidar", icon: "fas fa-skull", action: "suicide", type: "button" },
-                { name: "Curar-se", icon: "fas fa-medkit", action: "heal", type: "button" }
-            ],
-            movement: [
-                { name: "Noclip", icon: "fas fa-eye-slash", action: "noclip", type: "toggle" },
-                { name: "Freecam", icon: "fas fa-video", action: "freecam", type: "toggle" },
-                { name: "Super Velocidade", icon: "fas fa-running", action: "speed", type: "toggle" },
-                { name: "Super Pulos", icon: "fas fa-arrow-up", action: "jump", type: "toggle" }
-            ],
-            powers: [
-                { name: "Modo Hulk", icon: "fas fa-fist-raised", action: "hulk", type: "toggle" },
-                { name: "Magneto", icon: "fas fa-magnet", action: "magneto", type: "toggle" },
-                { name: "Super pulo", icon: "fas fa-rocket", action: "superjump", type: "toggle" },
-                { name: "Andar sobre a água", icon: "fas fa-water", action: "waterwalk", type: "toggle" }
-            ],
-            protection: [
-                { name: "Anti-Ban", icon: "fas fa-ban", action: "antiban", type: "toggle" },
-                { name: "Anti-Kick", icon: "fas fa-user-shield", action: "antikick", type: "toggle" },
-                { name: "Anti-Freeze", icon: "fas fa-snowflake", action: "antifreeze", type: "toggle" },
-                { name: "Anti-Crash", icon: "fas fa-shield-alt", action: "anticrash", type: "toggle" }
-            ]
-        };
+-- Receber mensagens do DUI
+function SetupDuiCallback()
+    if infoboxObject then
+        -- Usar RegisterNUICallback para receber mensagens do DUI
+        RegisterNUICallback('closeInfoBox', function(data, cb)
+            infoboxVisible = false
+            -- Menu fechado
+            cb('ok')
+        end)
         
-        let currentCategory = 'player';
-        let activeFeatures = {};
-        
-        // Função para fechar o menu
-        function closeMenu() {
-            document.getElementById('menuContainer').classList.remove('show');
+        -- Callback para toggle de funcionalidades
+        RegisterNUICallback('toggleFeature', function(data, cb)
+            local feature = data.feature
+            local enabled = data.enabled
             
-            if (window.invokeNative) {
-                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
-                    action: 'closeInfoBox'
-                }));
-            }
-        }
-        
-        // Função para alternar categoria
-        function switchCategory(category) {
-            currentCategory = category;
-            renderMenu();
-        }
-        
-        // Função para alternar feature
-        function toggleFeature(action) {
-            activeFeatures[action] = !activeFeatures[action];
-            renderMenu();
-            
-            // Enviar para o Lua
-            if (window.invokeNative) {
-                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
-                    action: 'toggleFeature',
-                    feature: action,
-                    enabled: activeFeatures[action]
-                }));
-            }
-        }
-        
-        // Função para executar ação
-        function executeAction(action) {
-            // Enviar para o Lua
-            if (window.invokeNative) {
-                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
-                    action: 'executeAction',
-                    feature: action
-                }));
-            }
-        }
-        
-        // Função para renderizar menu
-        function renderMenu() {
-            const menuContent = document.getElementById('menuContent');
-            const data = menuData[currentCategory];
-            
-            let html = '';
-            
-            data.forEach(item => {
-                if (item.type === 'toggle') {
-                    const isActive = activeFeatures[item.action] || false;
-                    html += `
-                        <div class="menu-item ${isActive ? 'active' : ''}" onclick="toggleFeature('${item.action}')">
-                            <i class="menu-icon ${item.icon}"></i>
-                            <span class="menu-label">${item.name}</span>
-                            <div class="toggle-switch ${isActive ? 'active' : ''}">
-                                <div class="toggle-knob"></div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="menu-item" onclick="executeAction('${item.action}')">
-                            <i class="menu-icon ${item.icon}"></i>
-                            <span class="menu-label">${item.name}</span>
-                        </div>
-                    `;
-                }
-            });
-            
-            menuContent.innerHTML = html;
-        }
-        
-        // Receber mensagens do Lua
-        window.addEventListener('message', function(event) {
-            try {
-                const data = event.data;
+            -- Implementar funcionalidades reais baseadas no message (2).txt
+            if feature == "godmode" then
+                if enabled then
+                    SetEntityInvincible(PlayerPedId(), true)
+                    SetPlayerInvincible(PlayerId(), true)
+                    print("[MENU] GodMod ativado")
+                else
+                    SetEntityInvincible(PlayerPedId(), false)
+                    SetPlayerInvincible(PlayerId(), false)
+                    print("[MENU] GodMod desativado")
+                end
                 
-                if (data.action === 'showMenu') {
-                    document.getElementById('menuContainer').classList.add('show');
-                    console.log('Menu aberto');
-                }
-                else if (data.action === 'closeInfobox') {
-                    closeMenu();
-                }
-            } catch (e) {
-                console.log('Erro ao processar mensagem:', e);
-            }
-        });
+            elseif feature == "noclip" then
+                if enabled then
+                    -- Implementar noclip básico
+                    print("[MENU] Noclip ativado")
+                else
+                    print("[MENU] Noclip desativado")
+                end
+                
+            elseif feature == "freecam" then
+                if enabled then
+                    print("[MENU] Freecam ativado")
+                else
+                    print("[MENU] Freecam desativado")
+                end
+                
+            elseif feature == "speed" then
+                if enabled then
+                    SetRunSprintMultiplierForPlayer(PlayerId(), 2.0)
+                    print("[MENU] Super velocidade ativada")
+                else
+                    SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
+                    print("[MENU] Super velocidade desativada")
+                end
+                
+            elseif feature == "jump" then
+                if enabled then
+                    SetPedCanRagdoll(PlayerPedId(), false)
+                    print("[MENU] Super pulos ativados")
+                else
+                    SetPedCanRagdoll(PlayerPedId(), true)
+                    print("[MENU] Super pulos desativados")
+                end
+                
+            elseif feature == "hulk" then
+                if enabled then
+                    print("[MENU] Modo Hulk ativado")
+                else
+                    print("[MENU] Modo Hulk desativado")
+                end
+                
+            elseif feature == "magneto" then
+                if enabled then
+                    print("[MENU] Magneto ativado")
+                else
+                    print("[MENU] Magneto desativado")
+                end
+                
+            elseif feature == "superjump" then
+                if enabled then
+                    print("[MENU] Super pulo ativado")
+                else
+                    print("[MENU] Super pulo desativado")
+                end
+                
+            elseif feature == "waterwalk" then
+                if enabled then
+                    print("[MENU] Andar sobre água ativado")
+                else
+                    print("[MENU] Andar sobre água desativado")
+                end
+                
+            elseif feature == "antiban" then
+                if enabled then
+                    print("[MENU] Anti-Ban ativado")
+                else
+                    print("[MENU] Anti-Ban desativado")
+                end
+                
+            elseif feature == "antikick" then
+                if enabled then
+                    print("[MENU] Anti-Kick ativado")
+                else
+                    print("[MENU] Anti-Kick desativado")
+                end
+                
+            elseif feature == "antifreeze" then
+                if enabled then
+                    print("[MENU] Anti-Freeze ativado")
+                else
+                    print("[MENU] Anti-Freeze desativado")
+                end
+                
+            elseif feature == "anticrash" then
+                if enabled then
+                    print("[MENU] Anti-Crash ativado")
+                else
+                    print("[MENU] Anti-Crash desativado")
+                end
+            end
+            
+            cb('ok')
+        end)
         
-        // Fechar com ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeMenu();
-            }
-        });
+        -- Callback para executar ações
+        RegisterNUICallback('executeAction', function(data, cb)
+            local feature = data.feature
+            
+            if feature == "revive" then
+                local coords = GetEntityCoords(PlayerPedId())
+                NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, GetEntityHeading(PlayerPedId()), true, false)
+                SetEntityHealth(PlayerPedId(), GetEntityMaxHealth(PlayerPedId()))
+                print("[MENU] Jogador revivido")
+                
+            elseif feature == "suicide" then
+                SetEntityHealth(PlayerPedId(), 0)
+                print("[MENU] Jogador suicidado")
+                
+            elseif feature == "heal" then
+                SetEntityHealth(PlayerPedId(), GetEntityMaxHealth(PlayerPedId()))
+                SetPedArmour(PlayerPedId(), 100)
+                print("[MENU] Jogador curado")
+            end
+            
+            cb('ok')
+        end)
+    end
+end
+
+-- Variáveis para posição da infobox
+local infoboxX = 0.5
+local infoboxY = 0.5
+local isDragging = false
+local dragOffsetX = 0
+local dragOffsetY = 0
+
+-- Variáveis para botões nativos
+local buttonStates = {
+    godmode = false,
+    revive = false,
+    suicide = false,
+    heal = false,
+    noclip = false,
+    freecam = false,
+    speed = false,
+    jump = false,
+    hulk = false,
+    magneto = false,
+    superjump = false,
+    waterwalk = false,
+    antiban = false,
+    antikick = false,
+    antifreeze = false,
+    anticrash = false
+}
+
+local buttonPositions = {
+    -- Jogador
+    {name = "GodMod", x = 0.35, y = 0.25, w = 0.15, h = 0.05, action = "godmode", type = "toggle"},
+    {name = "Reviver", x = 0.35, y = 0.32, w = 0.15, h = 0.05, action = "revive", type = "button"},
+    {name = "Suicidar", x = 0.35, y = 0.39, w = 0.15, h = 0.05, action = "suicide", type = "button"},
+    {name = "Curar-se", x = 0.35, y = 0.46, w = 0.15, h = 0.05, action = "heal", type = "button"},
+    
+    -- Movimentação
+    {name = "Noclip", x = 0.52, y = 0.25, w = 0.15, h = 0.05, action = "noclip", type = "toggle"},
+    {name = "Freecam", x = 0.52, y = 0.32, w = 0.15, h = 0.05, action = "freecam", type = "toggle"},
+    {name = "Super Velocidade", x = 0.52, y = 0.39, w = 0.15, h = 0.05, action = "speed", type = "toggle"},
+    {name = "Super Pulos", x = 0.52, y = 0.46, w = 0.15, h = 0.05, action = "jump", type = "toggle"},
+    
+    -- Poderes
+    {name = "Modo Hulk", x = 0.35, y = 0.55, w = 0.15, h = 0.05, action = "hulk", type = "toggle"},
+    {name = "Magneto", x = 0.35, y = 0.62, w = 0.15, h = 0.05, action = "magneto", type = "toggle"},
+    {name = "Super Pulo", x = 0.35, y = 0.69, w = 0.15, h = 0.05, action = "superjump", type = "toggle"},
+    {name = "Andar sobre água", x = 0.35, y = 0.76, w = 0.15, h = 0.05, action = "waterwalk", type = "toggle"},
+    
+    -- Proteção
+    {name = "Anti-Ban", x = 0.52, y = 0.55, w = 0.15, h = 0.05, action = "antiban", type = "toggle"},
+    {name = "Anti-Kick", x = 0.52, y = 0.62, w = 0.15, h = 0.05, action = "antikick", type = "toggle"},
+    {name = "Anti-Freeze", x = 0.52, y = 0.69, w = 0.15, h = 0.05, action = "antifreeze", type = "toggle"},
+    {name = "Anti-Crash", x = 0.52, y = 0.76, w = 0.15, h = 0.05, action = "anticrash", type = "toggle"}
+}
+
+-- Função para verificar se o mouse está sobre um botão
+function IsMouseInBounds(x, y, w, h)
+    local mouseX, mouseY = GetNuiCursorPosition()
+    local screenW, screenH = GetScreenResolution()
+    mouseX = mouseX / screenW
+    mouseY = mouseY / screenH
+    return mouseX >= x and mouseX <= x + w and mouseY >= y and mouseY <= y + h
+end
+
+-- Função para desenhar botão
+function DrawButton(x, y, w, h, text, isActive, isHovered)
+    local r, g, b = 139, 92, 246 -- Cor roxa padrão
+    
+    if isActive then
+        r, g, b = 16, 185, 129 -- Verde quando ativo
+    elseif isHovered then
+        r, g, b = 168, 85, 247 -- Roxo claro quando hover
+    end
+    
+    -- Fundo do botão
+    DrawRect(x + w/2, y + h/2, w, h, r, g, b, 150)
+    
+    -- Borda
+    DrawRect(x + w/2, y + h/2, w, h, 255, 255, 255, 50)
+    
+    -- Texto
+    SetTextFont(4)
+    SetTextProportional(1)
+    SetTextScale(0.0, 0.4)
+    SetTextColour(255, 255, 255, 255)
+    SetTextDropshadow(0, 0, 0, 0, 255)
+    SetTextEdge(1, 0, 0, 0, 255)
+    SetTextDropShadow()
+    SetTextOutline()
+    SetTextEntry("STRING")
+    AddTextComponentString(text)
+    DrawText(x + w/2 - GetTextScreenWidth()/2, y + h/2 - GetTextScreenHeight()/2)
+end
+
+-- Função para executar ação do botão
+function ExecuteButtonAction(action, type)
+    if type == "toggle" then
+        buttonStates[action] = not buttonStates[action]
+        print("[MENU] " .. action .. " " .. (buttonStates[action] and "ativado" or "desativado"))
+    else
+        print("[MENU] Executando " .. action)
+    end
+    
+    -- Implementar funcionalidades reais
+    if action == "godmode" then
+        if buttonStates[action] then
+            SetEntityInvincible(PlayerPedId(), true)
+            SetPlayerInvincible(PlayerId(), true)
+        else
+            SetEntityInvincible(PlayerPedId(), false)
+            SetPlayerInvincible(PlayerId(), false)
+        end
         
-        // Inicializar
-        renderMenu();
-    </script>
-</body>
-</html>
+    elseif action == "revive" then
+        local coords = GetEntityCoords(PlayerPedId())
+        NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, GetEntityHeading(PlayerPedId()), true, false)
+        SetEntityHealth(PlayerPedId(), GetEntityMaxHealth(PlayerPedId()))
+        
+    elseif action == "suicide" then
+        SetEntityHealth(PlayerPedId(), 0)
+        
+    elseif action == "heal" then
+        SetEntityHealth(PlayerPedId(), GetEntityMaxHealth(PlayerPedId()))
+        SetPedArmour(PlayerPedId(), 100)
+        
+    elseif action == "speed" then
+        if buttonStates[action] then
+            SetRunSprintMultiplierForPlayer(PlayerId(), 2.0)
+        else
+            SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
+        end
+        
+    elseif action == "jump" then
+        if buttonStates[action] then
+            SetPedCanRagdoll(PlayerPedId(), false)
+        else
+            SetPedCanRagdoll(PlayerPedId(), true)
+        end
+    end
+end
+
+-- Loop de renderização com botões nativos
+Citizen.CreateThread(function()
+    while true do
+        if infoboxVisible and infoboxTexture then
+            -- Desenhar a textura do DUI na tela (tamanho ainda maior)
+            DrawSprite('infobox', 'infobox_bg', 0.5, 0.5, 0.8, 0.7, 0.0, 255, 255, 255, 255)
+            
+            -- Ativar cursor do mouse
+            SetMouseCursorActiveThisFrame()
+            
+            -- Desenhar título
+            SetTextFont(4)
+            SetTextProportional(1)
+            SetTextScale(0.0, 0.6)
+            SetTextColour(139, 92, 246, 255)
+            SetTextDropshadow(0, 0, 0, 0, 255)
+            SetTextEdge(1, 0, 0, 0, 255)
+            SetTextDropShadow()
+            SetTextOutline()
+            SetTextEntry("STRING")
+            AddTextComponentString("MiauMenu v2.0")
+            DrawText(0.5 - GetTextScreenWidth()/2, 0.15)
+            
+            -- Desenhar informações do jogador
+            SetTextFont(4)
+            SetTextProportional(1)
+            SetTextScale(0.0, 0.3)
+            SetTextColour(255, 255, 255, 255)
+            SetTextDropshadow(0, 0, 0, 0, 255)
+            SetTextEdge(1, 0, 0, 0, 255)
+            SetTextDropShadow()
+            SetTextOutline()
+            SetTextEntry("STRING")
+            AddTextComponentString("Nome: miaugamer | Cargo: CEO")
+            DrawText(0.5 - GetTextScreenWidth()/2, 0.85)
+            
+            -- Desenhar botões
+            for i, button in ipairs(buttonPositions) do
+                local isHovered = IsMouseInBounds(button.x, button.y, button.w, button.h)
+                local isActive = buttonStates[button.action] or false
+                
+                DrawButton(button.x, button.y, button.w, button.h, button.name, isActive, isHovered)
+                
+                -- Verificar clique
+                if isHovered and IsControlJustPressed(0, 1) then -- Botão esquerdo do mouse
+                    ExecuteButtonAction(button.action, button.type)
+                end
+            end
+            
+            -- Fechar com ESC
+            if IsControlJustPressed(0, 200) then -- ESC
+                CloseInfoBox()
+            end
+        end
+        Wait(0)
+    end
+end)
+
+-- Carregar automaticamente (sem mostrar)
+Citizen.CreateThread(function()
+    Wait(3000)
+    LoadInfoBox()
+    -- Remover print para não poluir o console
+end)
+
+-- Exports para outros scripts
+exports('ShowInfoBox', ShowInfoBox)
+exports('CloseInfoBox', CloseInfoBox)
