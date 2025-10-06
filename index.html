@@ -108,11 +108,9 @@
             }
         });
         
-        // Fechar clicando na área da infobox (exceto no botão de fechar)
+        // Fechar clicando em qualquer lugar da infobox
         document.getElementById('infoboxContainer').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeInfoBox();
-            }
+            closeInfoBox();
         });
     </script>
 </body>
