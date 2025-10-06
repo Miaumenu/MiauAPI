@@ -585,13 +585,18 @@
             try {
                 const data = JSON.parse(event.data);
                 
-                if (data.action === 'showInfobox') {
+                if (data.action === 'showMenu') {
                     // Mostrar menu completo
                     document.getElementById('menuContainer').style.display = 'block';
                     document.getElementById('menuContainer').style.visibility = 'visible';
                     document.getElementById('menuContainer').style.opacity = '1';
+                    console.log('Menu completo aberto');
                 }
-                else if (data.action === 'closeInfobox') {
+                else if (data.action === 'showSimpleInfobox') {
+                    // Mostrar infobox simples (não implementado ainda)
+                    console.log('Infobox simples:', data.message);
+            }
+            else if (data.action === 'closeInfobox') {
                     closeMenu();
                 }
             } catch (e) {
