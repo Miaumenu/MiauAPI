@@ -2,159 +2,77 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>InfoBox</title>
+    <title>InfoBox GitHub</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: transparent;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: transparent; 
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             overflow: hidden;
+            width: 400px;
+            height: 200px;
         }
-
+        
         .infobox-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
             border: 2px solid #8b5cf6;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             color: white;
-            font-size: 14px;
-            min-width: 300px;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 10px rgba(139, 92, 246, 0.5);
-            z-index: 9999;
-            animation: glow 2s ease-in-out infinite alternate;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            animation: glow 2s infinite alternate;
         }
-
-        .infobox-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
-            padding-bottom: 10px;
-        }
-
-        .infobox-icon {
-            color: #8b5cf6;
-            font-size: 16px;
-        }
-
-        .infobox-title {
-            font-weight: 600;
-            color: #8b5cf6;
-        }
-
+        
         .infobox-content {
+            font-size: 14px;
             line-height: 1.4;
+            margin-top: 10px;
         }
-
-        .infobox-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            border-radius: 4px;
-            color: white;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        .infobox-close:hover {
-            background: rgba(239, 68, 68, 0.4);
-        }
-
+        
         @keyframes glow {
-            0% {
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 10px rgba(139, 92, 246, 0.5);
-            }
-            100% {
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(139, 92, 246, 0.8);
-            }
-        }
-
-        /* Esconder scrollbars */
-        ::-webkit-scrollbar {
-            display: none;
+            0% { box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.8); }
         }
     </style>
 </head>
 <body>
-    <div id="infobox" class="infobox-container" style="display: none;">
-        <div class="infobox-close" onclick="closeInfoBox()">×</div>
-        <div class="infobox-header">
-            <i class="infobox-icon">ℹ️</i>
-            <div class="infobox-title">INFORMAÇÃO</div>
+    <div class="infobox-container">
+        <div style="color: #8b5cf6; font-weight: bold; border-bottom: 1px solid #8b5cf6; padding-bottom: 5px;">
+            🚀 INFOBOX GITHUB
         </div>
-        <div class="infobox-content" id="infobox-content">
-            <!-- Conteúdo será inserido aqui -->
+        <div class="infobox-content" id="content">
+            Carregando...
         </div>
     </div>
 
     <script>
-        let infoboxTimeout = null;
-
-        // Função para mostrar a infobox
-        function showInfoBox(message, duration = 5000) {
-            const infobox = document.getElementById('infobox');
-            const content = document.getElementById('infobox-content');
-            
-            content.textContent = message;
-            infobox.style.display = 'block';
-
-            // Limpar timeout anterior se existir
-            if (infoboxTimeout) {
-                clearTimeout(infoboxTimeout);
-            }
-
-            // Auto-fechar após duração
-            if (duration > 0) {
-                infoboxTimeout = setTimeout(() => {
-                    closeInfoBox();
-                }, duration);
-            }
-        }
-
-        // Função para fechar a infobox
-        function closeInfoBox() {
-            const infobox = document.getElementById('infobox');
-            infobox.style.display = 'none';
-            
-            if (infoboxTimeout) {
-                clearTimeout(infoboxTimeout);
-                infoboxTimeout = null;
-            }
-        }
-
-        // Escutar eventos do DUI
+        let timeoutId = null;
+        
+        // Receber mensagens do Lua
         window.addEventListener('message', function(event) {
             const data = event.data;
             
             if (data.action === 'showInfobox') {
-                showInfoBox(data.message, data.duration);
-            } else if (data.action === 'closeInfobox') {
-                closeInfoBox();
+                document.getElementById('content').textContent = data.message;
+                
+                if (timeoutId) clearTimeout(timeoutId);
+                if (data.duration > 0) {
+                    timeoutId = setTimeout(() => {
+                        window.parent.postMessage({ action: 'closed' }, '*');
+                    }, data.duration);
+                }
+            }
+            else if (data.action === 'closeInfobox') {
+                window.parent.postMessage({ action: 'closed' }, '*');
             }
         });
-
+        
         // Fechar com ESC
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeInfoBox();
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.parent.postMessage({ action: 'closed' }, '*');
             }
         });
     </script>
