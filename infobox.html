@@ -200,9 +200,37 @@
             0%, 80%, 100% { opacity: 0.3; }
             40% { opacity: 1; }
         }
+
+        /* Botão de Teste */
+        .test-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
+    <button class="test-button" id="testButton">🎮 Testar Notificação</button>
     <div class="notifications-container" id="notificationsContainer"></div>
 
     <script>
@@ -210,10 +238,16 @@
             constructor() {
                 this.container = document.getElementById('notificationsContainer');
                 this.notifications = new Set();
+                this.testButton = document.getElementById('testButton');
                 
                 // Listen for FiveM messages
                 window.addEventListener('message', (event) => {
                     this.handleFiveMMessage(event.data);
+                });
+
+                // Botão de teste
+                this.testButton.addEventListener('click', () => {
+                    this.sendTestNotification();
                 });
 
                 console.log('🎯 MiauMenu Infobox carregada!');
@@ -223,6 +257,20 @@
                 if (data.action === 'showNotification') {
                     this.showNotification(data.message, data.type, data.duration);
                 }
+            }
+
+            sendTestNotification() {
+                // Enviar mensagem para o FiveM
+                fetch(`https://${GetParentResourceName()}/testNotification`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: 'info',
+                        message: 'Teste via botão'
+                    })
+                });
             }
 
             showNotification(message, type = 'info', duration = 5000) {
