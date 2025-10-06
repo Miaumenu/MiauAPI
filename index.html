@@ -79,14 +79,12 @@
         
         // Função para fechar a infobox
         function closeInfoBox() {
-            // Usar fetch para enviar callback para o Lua
-            fetch('https://menu/close', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({})
-            });
+            // Enviar mensagem para o DUI (FiveM)
+            if (window.invokeNative) {
+                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ 
+                    action: 'closeInfoBox' 
+                }));
+            }
         }
         
         // Receber mensagens do Lua via DUI
