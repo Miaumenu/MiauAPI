@@ -23,6 +23,32 @@
             height: 100%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.9);
             animation: glow 2s infinite alternate;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.8);
+            border: 1px solid rgba(239, 68, 68, 1);
+            border-radius: 50%;
+            color: white;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        
+        .close-button:hover {
+            background: rgba(239, 68, 68, 1);
+            transform: scale(1.1);
         }
         
         .infobox-content {
@@ -38,7 +64,8 @@
     </style>
 </head>
 <body>
-    <div class="infobox-container">
+    <div class="infobox-container" id="infoboxContainer">
+        <div class="close-button" id="closeButton" onclick="closeInfoBox()">×</div>
         <div style="color: #8b5cf6; font-weight: bold; border-bottom: 1px solid #8b5cf6; padding-bottom: 5px;">
             🚀 INFOBOX GITHUB
         </div>
@@ -50,6 +77,13 @@
     <script>
         let timeoutId = null;
         
+        // Função para fechar a infobox
+        function closeInfoBox() {
+            if (window.invokeNative) {
+                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ action: 'closed' }));
+            }
+        }
+        
         // Receber mensagens do Lua via DUI
         window.addEventListener('message', function(event) {
             try {
@@ -57,21 +91,10 @@
                 
                 if (data.action === 'showInfobox') {
                     document.getElementById('content').textContent = data.message;
-                    
-                    if (timeoutId) clearTimeout(timeoutId);
-                    if (data.duration > 0) {
-                        timeoutId = setTimeout(() => {
-                            // Enviar callback para o Lua
-                            if (window.invokeNative) {
-                                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ action: 'closed' }));
-                            }
-                        }, data.duration);
-                    }
+                    // Removido o fechamento automático - agora só fecha por clique
                 }
                 else if (data.action === 'closeInfobox') {
-                    if (window.invokeNative) {
-                        window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ action: 'closed' }));
-                    }
+                    closeInfoBox();
                 }
             } catch (e) {
                 console.log('Erro ao processar mensagem:', e);
@@ -81,9 +104,14 @@
         // Fechar com ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (window.invokeNative) {
-                    window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ action: 'closed' }));
-                }
+                closeInfoBox();
+            }
+        });
+        
+        // Fechar clicando na área da infobox (exceto no botão de fechar)
+        document.getElementById('infoboxContainer').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeInfoBox();
             }
         });
     </script>
