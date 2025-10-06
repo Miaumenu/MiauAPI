@@ -290,6 +290,9 @@
                     showInfobox(data.message, data.level, data.duration);
                 } else if (data.action === 'closeInfobox') {
                     closeAllInfoboxes();
+                } else if (data.action === 'test') {
+                    console.log('[INFOBOX] Teste NUI recebido:', data.message);
+                    showInfobox('Teste NUI funcionando!', 'info', 3000);
                 }
             } catch (e) {
                 console.log('[INFOBOX] Erro ao processar mensagem:', e, 'Data:', event.data);
@@ -316,6 +319,12 @@
 
         console.log('[INFOBOX] Sistema MiauAPI carregado com sucesso!');
         console.log('[INFOBOX] Para testar, execute: testInfobox() no console');
+        
+        // Teste automático para verificar se está funcionando
+        setTimeout(() => {
+            console.log('[INFOBOX] Teste automático - mostrando infobox de teste');
+            showInfobox('Sistema InfoBox carregado!', 'sucesso', 3000);
+        }, 2000);
     </script>
 </body>
 </html>
