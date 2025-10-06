@@ -307,13 +307,11 @@
         function closeMenu() {
             document.getElementById('menuContainer').classList.remove('show');
             
-            fetch(`https://${GetParentResourceName()}/closeInfoBox`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({})
-            });
+            if (window.invokeNative) {
+                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
+                    action: 'closeInfoBox'
+                }));
+            }
         }
         
         // Função para alternar tab
@@ -333,16 +331,13 @@
             renderContent();
             
             // Enviar para o Lua
-            fetch(`https://${GetParentResourceName()}/toggleFeature`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+            if (window.invokeNative) {
+                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
+                    action: 'toggleFeature',
                     feature: action,
                     enabled: activeFeatures[action]
-                })
-            });
+                }));
+            }
         }
         
         // Função para renderizar conteúdo
