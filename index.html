@@ -50,29 +50,40 @@
     <script>
         let timeoutId = null;
         
-        // Receber mensagens do Lua
+        // Receber mensagens do Lua via DUI
         window.addEventListener('message', function(event) {
-            const data = event.data;
-            
-            if (data.action === 'showInfobox') {
-                document.getElementById('content').textContent = data.message;
+            try {
+                const data = JSON.parse(event.data);
                 
-                if (timeoutId) clearTimeout(timeoutId);
-                if (data.duration > 0) {
-                    timeoutId = setTimeout(() => {
-                        window.parent.postMessage({ action: 'closed' }, '*');
-                    }, data.duration);
+                if (data.action === 'showInfobox') {
+                    document.getElementById('content').textContent = data.message;
+                    
+                    if (timeoutId) clearTimeout(timeoutId);
+                    if (data.duration > 0) {
+                        timeoutId = setTimeout(() => {
+                            // Enviar callback para o Lua
+                            if (window.invokeNative) {
+                                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ action: 'closed' }));
+                            }
+                        }, data.duration);
+                    }
                 }
-            }
-            else if (data.action === 'closeInfobox') {
-                window.parent.postMessage({ action: 'closed' }, '*');
+                else if (data.action === 'closeInfobox') {
+                    if (window.invokeNative) {
+                        window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ action: 'closed' }));
+                    }
+                }
+            } catch (e) {
+                console.log('Erro ao processar mensagem:', e);
             }
         });
         
         // Fechar com ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                window.parent.postMessage({ action: 'closed' }, '*');
+                if (window.invokeNative) {
+                    window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ action: 'closed' }));
+                }
             }
         });
     </script>
