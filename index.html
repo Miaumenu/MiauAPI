@@ -35,12 +35,6 @@
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             border: 1px solid #333;
-            visibility: hidden;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-        
-        .menu-container.show {
             visibility: visible;
             opacity: 1;
         }
@@ -481,7 +475,7 @@
         
         // Função para fechar o menu
         function closeMenu() {
-            document.getElementById('menuContainer').classList.remove('show');
+            document.getElementById('menuContainer').style.display = 'none';
             
             fetch(`https://${GetParentResourceName()}/closeInfoBox`, {
                 method: 'POST',
@@ -595,11 +589,11 @@
         // Receber mensagens do Lua
         window.addEventListener('message', function(event) {
             try {
-                const data = JSON.parse(event.data);
+            const data = event.data;
                 
                 if (data.action === 'showMenu') {
                     // Mostrar menu completo
-                    document.getElementById('menuContainer').classList.add('show');
+                    document.getElementById('menuContainer').style.display = 'block';
                     console.log('Menu completo aberto');
                 }
                 else if (data.action === 'showSimpleInfobox') {
