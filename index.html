@@ -474,15 +474,22 @@
         let currentCategory = 'player';
         let currentTab = 'general';
         
+        // Função para obter o nome do resource
+        function GetParentResourceName() {
+            return 'menu';
+        }
+        
         // Função para fechar o menu
         function closeMenu() {
             document.getElementById('menuContainer').classList.remove('show');
             
-            if (window.invokeNative) {
-                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ 
-                    action: 'closeInfoBox' 
-                }));
-            }
+            fetch(`https://${GetParentResourceName()}/closeInfoBox`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            });
         }
         
         // Função para alternar toggle
@@ -492,15 +499,18 @@
                 renderContent();
                 
                 // Enviar para o Lua
-                if (window.invokeNative) {
-                    window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
-                        action: 'toggleFeature',
+                fetch(`https://${GetParentResourceName()}/toggleFeature`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
                         category: category,
                         tab: tab,
                         index: index,
                         enabled: menuData[category][tab][index].enabled
-                    }));
-                }
+                    })
+                });
             }
         }
         
