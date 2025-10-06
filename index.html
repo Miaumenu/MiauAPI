@@ -298,15 +298,22 @@
         let currentTab = 'player';
         let activeFeatures = {};
         
+        // Função para obter o nome do resource
+        function GetParentResourceName() {
+            return 'menu';
+        }
+        
         // Função para fechar o menu
         function closeMenu() {
             document.getElementById('menuContainer').classList.remove('show');
             
-            if (window.invokeNative) {
-                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
-                    action: 'closeInfoBox'
-                }));
-            }
+            fetch(`https://${GetParentResourceName()}/closeInfoBox`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            });
         }
         
         // Função para alternar tab
@@ -326,13 +333,16 @@
             renderContent();
             
             // Enviar para o Lua
-            if (window.invokeNative) {
-                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
-                    action: 'toggleFeature',
+            fetch(`https://${GetParentResourceName()}/toggleFeature`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
                     feature: action,
                     enabled: activeFeatures[action]
-                }));
-            }
+                })
+            });
         }
         
         // Função para renderizar conteúdo
