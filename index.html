@@ -477,13 +477,11 @@
         function closeMenu() {
             document.getElementById('menuContainer').style.display = 'none';
             
-            fetch(`https://${GetParentResourceName()}/closeInfoBox`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({})
-            });
+            if (window.invokeNative) {
+                window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
+                    action: 'closeInfoBox'
+                }));
+            }
         }
         
         // Função para alternar toggle
@@ -493,18 +491,15 @@
                 renderContent();
                 
                 // Enviar para o Lua
-                fetch(`https://${GetParentResourceName()}/toggleFeature`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
+                if (window.invokeNative) {
+                    window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
+                        action: 'toggleFeature',
                         category: category,
                         tab: tab,
                         index: index,
                         enabled: menuData[category][tab][index].enabled
-                    })
-                });
+                    }));
+                }
             }
         }
         
