@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infobox Notifications</title>
+    <title>MiauMenu Infobox</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', Arial, sans-serif;
         }
 
         body {
@@ -17,36 +17,31 @@
             overflow: hidden;
             width: 100vw;
             height: 100vh;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            padding: 20px;
         }
 
-        /* Container Principal das Notificações */
         .notifications-container {
-            position: fixed;
-            top: 50px;
-            right: 20px;
-            width: 260px;
-            z-index: 9999;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            width: 260px;
         }
 
-        /* Card de Notificação */
-        .notification-card {
+        .notification {
             position: relative;
             width: 248px;
             min-height: 58px;
             padding: 8px 12px 8px 16px;
             border-radius: 7px;
-            background: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(0, 170, 255, 0.1407) 104.72%);
-            border: 1px solid rgba(0, 170, 255, 0.61);
-            box-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.25);
             backdrop-filter: blur(10px);
             animation: slideInRight 0.3s ease-out;
             transition: all 0.3s ease;
+            overflow: hidden;
         }
 
-        /* Barra Lateral Colorida */
         .notification-bar {
             position: absolute;
             left: 4px;
@@ -54,10 +49,8 @@
             width: 3px;
             height: 46px;
             border-radius: 7px;
-            box-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.61);
         }
 
-        /* Conteúdo da Notificação */
         .notification-content {
             margin-left: 8px;
         }
@@ -71,6 +64,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            color: #FFFFFF;
         }
 
         .notification-message {
@@ -82,85 +76,55 @@
             word-wrap: break-word;
         }
 
-        /* Ícones */
-        .notification-icon {
-            width: 12px;
-            height: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-        }
-
         /* Tipos de Notificação */
-        .notification-success {
+        .success {
             background: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(17, 255, 0, 0.1407) 104.72%);
             border: 1px solid rgba(17, 255, 0, 0.61);
             box-shadow: 0px 0px 4px 2px rgba(17, 255, 0, 0.25);
         }
-        .notification-success .notification-bar {
+        .success .notification-bar {
             background: #11FF00;
             box-shadow: 0px 0px 4px 2px rgba(17, 255, 0, 0.25);
         }
 
-        .notification-error {
+        .error {
             background: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 0, 0, 0.1407) 104.72%);
             border: 1px solid rgba(255, 0, 0, 0.61);
             box-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
         }
-        .notification-error .notification-bar {
+        .error .notification-bar {
             background: #FF0000;
             box-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
         }
 
-        .notification-warning {
+        .warning {
             background: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(238, 255, 0, 0.1407) 104.72%);
             border: 1px solid rgba(238, 255, 0, 0.61);
             box-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.25);
         }
-        .notification-warning .notification-bar {
+        .warning .notification-bar {
             background: #EEFF00;
             box-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.61);
         }
 
-        .notification-info {
+        .info {
             background: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(0, 170, 255, 0.1407) 104.72%);
             border: 1px solid rgba(0, 170, 255, 0.61);
             box-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.25);
         }
-        .notification-info .notification-bar {
+        .info .notification-bar {
             background: #00AAFF;
             box-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.61);
         }
 
-        .notification-loading {
+        .loading {
             background: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 255, 255, 0.1407) 104.72%);
             border: 1px solid rgba(255, 255, 255, 0.61);
             box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.25);
         }
-        .notification-loading .notification-bar {
+        .loading .notification-bar {
             background: #FFFFFF;
             box-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.61);
-        }
-
-        /* Animação de Loading */
-        .loading-dots {
-            display: inline-flex;
-            gap: 2px;
-        }
-        .loading-dots span {
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            background: white;
-            animation: loading 1.4s infinite ease-in-out;
-        }
-        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes loading {
-            0%, 80%, 100% { opacity: 0.3; }
-            40% { opacity: 1; }
         }
 
         /* Animações */
@@ -191,28 +155,50 @@
         }
 
         /* Progress Bar */
-        .notification-progress {
+        .progress-bar {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 2px;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 0 0 7px 7px;
-            overflow: hidden;
         }
 
-        .notification-progress-bar {
+        .progress-fill {
             height: 100%;
             width: 100%;
-            border-radius: 0 0 7px 7px;
-            transform-origin: left;
-            animation: progressBar 5s linear forwards;
+            animation: progress 5s linear forwards;
         }
 
-        @keyframes progressBar {
-            from { transform: scaleX(1); }
-            to { transform: scaleX(0); }
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        .success .progress-fill { background: #11FF00; }
+        .error .progress-fill { background: #FF0000; }
+        .warning .progress-fill { background: #EEFF00; }
+        .info .progress-fill { background: #00AAFF; }
+        .loading .progress-fill { background: #FFFFFF; }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: inline-flex;
+            gap: 2px;
+        }
+        .loading-dots span {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: white;
+            animation: loading 1.4s infinite ease-in-out;
+        }
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loading {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
         }
     </style>
 </head>
@@ -225,35 +211,34 @@
                 this.container = document.getElementById('notificationsContainer');
                 this.notifications = new Set();
                 
-                // Ouvir mensagens do FiveM
+                // Listen for FiveM messages
                 window.addEventListener('message', (event) => {
                     this.handleFiveMMessage(event.data);
                 });
 
-                // Exemplo de teste automático
-                this.autoTest();
+                console.log('🎯 MiauMenu Infobox carregada!');
             }
 
             handleFiveMMessage(data) {
-                if (data.action === 'notify') {
-                    this.showNotification(data.message, data.type);
+                if (data.action === 'showNotification') {
+                    this.showNotification(data.message, data.type, data.duration);
                 }
             }
 
-            showNotification(message, type = 'info') {
+            showNotification(message, type = 'info', duration = 5000) {
                 const notification = this.createNotification(message, type);
                 this.container.appendChild(notification);
                 this.notifications.add(notification);
 
-                // Auto-remover após 5 segundos
+                // Auto remove after duration
                 setTimeout(() => {
                     this.removeNotification(notification);
-                }, 5000);
+                }, duration);
             }
 
             createNotification(message, type) {
                 const notification = document.createElement('div');
-                notification.className = `notification-card notification-${type}`;
+                notification.className = `notification ${type}`;
 
                 const title = this.getTitleByType(type);
                 const icon = this.getIconByType(type);
@@ -262,13 +247,13 @@
                     <div class="notification-bar"></div>
                     <div class="notification-content">
                         <div class="notification-title">
-                            <span class="notification-icon">${icon}</span>
+                            <span>${icon}</span>
                             ${title}
                         </div>
                         <div class="notification-message">${message}</div>
                     </div>
-                    <div class="notification-progress">
-                        <div class="notification-progress-bar" style="background: ${this.getProgressColor(type)}"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
                     </div>
                 `;
 
@@ -297,17 +282,6 @@
                 return icons[type] || 'ℹ️';
             }
 
-            getProgressColor(type) {
-                const colors = {
-                    'success': '#11FF00',
-                    'error': '#FF0000',
-                    'warning': '#EEFF00',
-                    'info': '#00AAFF',
-                    'loading': '#FFFFFF'
-                };
-                return colors[type] || '#00AAFF';
-            }
-
             removeNotification(notification) {
                 if (this.notifications.has(notification)) {
                     notification.classList.add('notification-exit');
@@ -319,37 +293,19 @@
                     }, 300);
                 }
             }
-
-            // Teste automático das notificações
-            autoTest() {
-                setTimeout(() => {
-                    this.showNotification('Não foi possível utilizar esta função!<br>Contate um administrador ou abra ticket em nosso discord!', 'error');
-                }, 1000);
-
-                setTimeout(() => {
-                    this.showNotification('Teleporte para a localização personalizada feita com <strong>exito</strong>!', 'success');
-                }, 2000);
-
-                setTimeout(() => {
-                    this.showNotification('Menu injetado com <strong>sucesso</strong>!<br>Agora basta configurar <strong>qual bind</strong> irá abrir o menu.', 'warning');
-                }, 3000);
-
-                setTimeout(() => {
-                    this.showNotification('Menu injetado com <strong>sucesso</strong>!<br>Agora basta configurar <strong>qual bind</strong> irá abrir o menu.', 'info');
-                }, 4000);
-
-                setTimeout(() => {
-                    this.showNotification('Menu injetado com <strong>sucesso</strong>!<br>Agora basta configurar <strong>qual bind</strong> irá abrir o menu.', 'loading');
-                }, 5000);
-            }
         }
 
-        // Inicializar quando o DOM carregar
+        // Initialize when DOM loads
         document.addEventListener('DOMContentLoaded', () => {
-            new NotificationManager();
+            window.notificationManager = new NotificationManager();
+            
+            // Test notifications
+            setTimeout(() => {
+                window.notificationManager.showNotification('Sistema de notificações carregado com sucesso!', 'success', 3000);
+            }, 1000);
         });
 
-        // Função global para teste via console
+        // Global function for testing
         window.showTestNotification = (type = 'info') => {
             const messages = {
                 'success': 'Operação realizada com sucesso!',
@@ -359,8 +315,7 @@
                 'loading': 'Processando sua solicitação...'
             };
             
-            const manager = new NotificationManager();
-            manager.showNotification(messages[type], type);
+            window.notificationManager.showNotification(messages[type], type);
         };
     </script>
 </body>
