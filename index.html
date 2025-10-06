@@ -306,6 +306,9 @@
                 
                 if (data.action === 'showInfobox') {
                     showInfobox(data.message, data.level, data.duration);
+                } else if (data.action === 'notify') {
+                    // Suporte para base.lua
+                    showInfobox(data.message, data.type, 5000);
                 } else if (data.action === 'closeInfobox') {
                     closeAllInfoboxes();
                 } else if (data.action === 'test') {
