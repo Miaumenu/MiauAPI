@@ -284,6 +284,7 @@
         window.addEventListener('message', function(event) {
             try {
                 const data = JSON.parse(event.data);
+                console.log('[INFOBOX] Recebida mensagem:', data);
                 
                 if (data.action === 'showInfobox') {
                     showInfobox(data.message, data.level, data.duration);
@@ -291,7 +292,7 @@
                     closeAllInfoboxes();
                 }
             } catch (e) {
-                console.log('Erro ao processar mensagem:', e);
+                console.log('[INFOBOX] Erro ao processar mensagem:', e, 'Data:', event.data);
             }
         });
 
@@ -308,7 +309,13 @@
             sendToLua({ action: 'closeInfoBox' });
         };
 
+        // Função de teste para verificar se está funcionando
+        window.testInfobox = function() {
+            showInfobox('Teste do sistema InfoBox!', 'info', 3000);
+        };
+
         console.log('[INFOBOX] Sistema MiauAPI carregado com sucesso!');
+        console.log('[INFOBOX] Para testar, execute: testInfobox() no console');
     </script>
 </body>
 </html>
