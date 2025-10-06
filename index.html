@@ -2,323 +2,89 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>MiauMenu - FiveM</title>
+    <title>INFOBOX GITHUB - FiveM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        body { 
-            background: transparent; 
-            font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
-            overflow: hidden;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: transparent;
             width: 100vw;
             height: 100vh;
             color: white;
+            overflow: hidden;
         }
         
-        .menu-container {
+        .infobox-container {
             position: absolute;
             top: 50%;
-            transform: translateY(-50%);
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 400px;
-            height: 300px;
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
-            border-radius: 10px;
+            width: 500px;
+            height: 400px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            border-radius: 15px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            border: 1px solid #333;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9);
+            border: 3px solid #8b5cf6;
             visibility: visible;
             opacity: 1;
         }
         
-        .menu-header {
+        .infobox-header {
             position: relative;
             width: 100%;
-            height: 50px;
-            overflow: hidden;
-            border-radius: 10px 10px 0 0;
-            z-index: 1;
-            flex-shrink: 0;
+            height: 80px;
             background: linear-gradient(135deg, #8b5cf6, #a855f7);
-        }
-        
-        .menu-header img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        
-        .breadcrumb-container {
-            background: linear-gradient(135deg, #000000e6, #1a1a1acc);
-            color: #fff;
-            font-size: 12px;
-            padding: 8px 12px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-        }
-        
-        .menu-content {
             display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-        
-        .sidebar {
-            width: 50px;
-            background: #111;
-            border-right: 1px solid #333;
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 10px 0;
+            padding: 0 20px;
+            border-bottom: 2px solid #8b5cf6;
         }
         
-        .sidebar-item {
-            width: 35px;
-            height: 35px;
-            margin: 5px 0;
+        .rocket-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        
-        .sidebar-item:hover {
-            background: #333;
-        }
-        
-        .sidebar-item.active {
-            background: #8b5cf6;
-        }
-        
-        .sidebar-item.active::before {
-            content: '';
-            position: absolute;
-            left: -10px;
-            top: 0;
-            width: 3px;
-            height: 100%;
-            background: #ff4444;
-            border-radius: 0 2px 2px 0;
-        }
-        
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .tabs {
-            display: flex;
-            background: #1a1a1a;
-            border-bottom: 1px solid #333;
-        }
-        
-        .tab {
-            padding: 10px 15px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s ease;
-            font-size: 12px;
-        }
-        
-        .tab:hover {
-            background: #333;
-        }
-        
-        .tab.active {
-            border-bottom-color: #ff4444;
-            color: #ff4444;
-        }
-        
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-        }
-        
-        .section {
-            margin-bottom: 15px;
-        }
-        
-        .section-title {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #8b5cf6;
-        }
-        
-        .section-title i {
-            margin-right: 8px;
-            font-size: 16px;
-        }
-        
-        .feature-list {
-            display: grid;
-            gap: 8px;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background: #1a1a1a;
-            border-radius: 5px;
-            border: 1px solid #333;
-            transition: all 0.2s ease;
-        }
-        
-        .feature-item:hover {
-            background: #222;
-            border-color: #8b5cf6;
-        }
-        
-        .feature-name {
-            flex: 1;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .feature-description {
-            font-size: 10px;
-            color: #888;
-            margin-top: 2px;
-        }
-        
-        .feature-status {
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 9px;
-            font-weight: 600;
-            margin-right: 10px;
-        }
-        
-        .status-safe {
-            background: #10b981;
+            margin-right: 15px;
+            font-size: 20px;
             color: white;
         }
         
-        .status-risk {
-            background: #ef4444;
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
             color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
-        .feature-toggle {
-            position: relative;
-            width: 35px;
-            height: 20px;
-            background: #333;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .feature-toggle.active {
-            background: #8b5cf6;
-        }
-        
-        .feature-toggle::after {
-            content: '';
+        .header-line {
             position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-        
-        .feature-toggle.active::after {
-            transform: translateX(15px);
-        }
-        
-        .search-container {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            align-items: center;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 5px;
-            padding: 5px 10px;
-        }
-        
-        .search-container input {
-            background: transparent;
-            border: none;
-            color: white;
-            outline: none;
-            font-size: 10px;
-            width: 120px;
-        }
-        
-        .search-container i {
-            color: #888;
-            margin-right: 5px;
-        }
-        
-        .user-profile {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            align-items: center;
-            background: #1a1a1a;
-            border-radius: 5px;
-            padding: 10px;
-            border: 1px solid #333;
-        }
-        
-        .user-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #8b5cf6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-            font-size: 12px;
-        }
-        
-        .user-info {
-            flex: 1;
-        }
-        
-        .user-name {
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        .user-role {
-            font-size: 9px;
-            color: #888;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, #8b5cf6, transparent);
         }
         
         .close-button {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 25px;
-            height: 25px;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
             background: #ef4444;
             border: none;
             border-radius: 50%;
@@ -327,7 +93,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 16px;
+            font-weight: bold;
             transition: all 0.2s ease;
         }
         
@@ -336,146 +103,188 @@
             transform: scale(1.1);
         }
         
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar {
-            width: 5px;
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #0f0f0f;
         }
         
-        ::-webkit-scrollbar-track {
-            background: #1a1a1a;
+        .loading-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
         }
         
-        ::-webkit-scrollbar-thumb {
-            background: #8b5cf6;
-            border-radius: 2px;
+        .user-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a855f7;
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .user-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .user-avatar.blue {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        
+        .user-avatar.purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .user-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+        }
+        
+        .status-icon.fire {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .status-text {
+            font-size: 12px;
+            color: #8b5cf6;
+            font-weight: 600;
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            color: #888;
+        }
+        
+        .leaf-icon {
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6px;
+            color: white;
+        }
+        
+        .clickable-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            cursor: pointer;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
-    <div class="menu-container" id="menuContainer">
-        <div class="close-button" onclick="closeMenu()">×</div>
+    <div class="infobox-container" id="infoboxContainer">
+        <div class="clickable-area" onclick="closeMenu()"></div>
         
-        <div class="menu-header">
-            <div class="breadcrumb-container">
-                <i class="fas fa-gamepad"></i> MiauMenu v2.0
-            </div>
+        <div class="infobox-header">
+            <div class="rocket-icon">🚀</div>
+            <div class="header-title">INFOBOX GITHUB</div>
+            <div class="header-line"></div>
+            <button class="close-button" onclick="closeMenu()">×</button>
         </div>
         
-        <div class="search-container">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Pesquisar..." id="searchInput">
-        </div>
-        
-        <div class="menu-content">
-            <div class="sidebar">
-                <div class="sidebar-item active" data-category="player">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="sidebar-item" data-category="vehicle">
-                    <i class="fas fa-car"></i>
-                </div>
-                <div class="sidebar-item" data-category="weapon">
-                    <i class="fas fa-gun"></i>
-                </div>
-                <div class="sidebar-item" data-category="online">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="sidebar-item" data-category="exploit">
-                    <i class="fas fa-bug"></i>
-                </div>
-                <div class="sidebar-item" data-category="visual">
-                    <i class="fas fa-eye"></i>
-                </div>
-                <div class="sidebar-item" data-category="settings">
-                    <i class="fas fa-cog"></i>
-                </div>
-            </div>
+        <div class="content-area">
+            <div class="loading-text">Carregando...</div>
             
-            <div class="main-content">
-                <div class="tabs">
-                    <div class="tab active" data-tab="general">Jogador</div>
-                    <div class="tab" data-tab="movement">Movimentação</div>
-                    <div class="tab" data-tab="powers">Poderes</div>
-                    <div class="tab" data-tab="protection">Proteção</div>
+            <div class="user-list">
+                <div class="user-item">
+                    <div class="user-avatar purple">👤</div>
+                    <div class="user-info">
+                        <div class="user-name">!Miau Gamer</div>
+                        <div class="user-status">
+                            <div class="status-icon fire">🔥</div>
+                            <div class="status-text">MIAU %</div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="content-area" id="contentArea">
-                    <!-- Conteúdo será inserido aqui via JavaScript -->
+                <div class="user-item">
+                    <div class="user-avatar blue">👤</div>
+                    <div class="user-info">
+                        <div class="user-name">Biel</div>
+                        <div class="user-status">
+                            <div class="status-icon fire">🔥</div>
+                            <div class="status-text">ONLINE</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="user-profile">
-            <div class="user-avatar">🐱</div>
-            <div class="user-info">
-                <div class="user-name">Nome: miaugamer</div>
-                <div class="user-role">Cargo: CEO</div>
-            </div>
+        <div class="footer">
+            <span>FiveM (b3258)</span>
+            <div class="leaf-icon">🍃</div>
         </div>
     </div>
 
     <script>
-        // Dados do menu
-        const menuData = {
-            player: {
-                general: [
-                    { name: "GodMod", description: "Invencibilidade total", status: "safe", enabled: true },
-                    { name: "Reviver", description: "Mata o jogador", status: "safe", enabled: false },
-                    { name: "Suicidar", description: "Retira sua vida", status: "safe", enabled: false },
-                    { name: "Curar-se", description: "Restaura vida e armadura", status: "safe", enabled: false }
-                ],
-                movement: [
-                    { name: "Noclip", description: "Voar invisível", status: "safe", enabled: false },
-                    { name: "Freecam", description: "Escute e observe de longe", status: "safe", enabled: false },
-                    { name: "Super Velocidade", description: "Correr mais rápido", status: "safe", enabled: false },
-                    { name: "Super Pulos", description: "Pular mais alto", status: "safe", enabled: false }
-                ],
-                powers: [
-                    { name: "Modo Hulk", description: "Arremessa veículos no Y", status: "safe", enabled: false },
-                    { name: "Magneto", description: "Atrair e repelir veículos", status: "safe", enabled: false },
-                    { name: "Super pulo", description: "Pular uma altura maior", status: "safe", enabled: false },
-                    { name: "Andar sobre a água", description: "Anda sobre a água", status: "risk", enabled: false }
-                ],
-                protection: [
-                    { name: "Anti-Ban", description: "Proteção contra banimento", status: "safe", enabled: true },
-                    { name: "Anti-Kick", description: "Proteção contra kick", status: "safe", enabled: true },
-                    { name: "Anti-Freeze", description: "Proteção contra congelamento", status: "safe", enabled: false },
-                    { name: "Anti-Crash", description: "Proteção contra crash", status: "safe", enabled: true }
-                ]
-            },
-            vehicle: {
-                general: [
-                    { name: "Spawn Veículo", description: "Criar veículo instantaneamente", status: "safe", enabled: false },
-                    { name: "Reparar Veículo", description: "Consertar veículo atual", status: "safe", enabled: false },
-                    { name: "Tunar Veículo", description: "Melhorar performance", status: "safe", enabled: false },
-                    { name: "Pintar Veículo", description: "Mudar cor do veículo", status: "safe", enabled: false }
-                ]
-            },
-            weapon: {
-                general: [
-                    { name: "Dar Arma", description: "Spawnar armas", status: "safe", enabled: false },
-                    { name: "Munição Infinita", description: "Nunca ficar sem munição", status: "safe", enabled: false },
-                    { name: "Sem Recoil", description: "Eliminar recuo das armas", status: "safe", enabled: false },
-                    { name: "Aimbot", description: "Mira automática", status: "risk", enabled: false }
-                ]
-            }
-        };
-        
-        let currentCategory = 'player';
-        let currentTab = 'general';
-        
-        // Função para obter o nome do resource
-        function GetParentResourceName() {
-            return 'menu';
-        }
-        
         // Função para fechar o menu
         function closeMenu() {
-            document.getElementById('menuContainer').style.display = 'none';
+            document.getElementById('infoboxContainer').style.display = 'none';
             
             if (window.invokeNative) {
                 window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
@@ -484,118 +293,22 @@
             }
         }
         
-        // Função para alternar toggle
-        function toggleFeature(category, tab, index) {
-            if (menuData[category] && menuData[category][tab]) {
-                menuData[category][tab][index].enabled = !menuData[category][tab][index].enabled;
-                renderContent();
-                
-                // Enviar para o Lua
-                if (window.invokeNative) {
-                    window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({
-                        action: 'toggleFeature',
-                        category: category,
-                        tab: tab,
-                        index: index,
-                        enabled: menuData[category][tab][index].enabled
-                    }));
-                }
-            }
-        }
-        
-        // Função para renderizar conteúdo
-        function renderContent() {
-            const contentArea = document.getElementById('contentArea');
-            const data = menuData[currentCategory];
-            
-            if (!data || !data[currentTab]) {
-                contentArea.innerHTML = '<div style="text-align: center; padding: 2vh; color: #888;">Nenhuma funcionalidade disponível</div>';
-                return;
-            }
-            
-            const features = data[currentTab];
-            const sections = ['Geral', 'Movimentação', 'Poderes', 'Proteção'];
-            const icons = ['fas fa-user', 'fas fa-running', 'fas fa-fire', 'fas fa-shield-alt'];
-            
-            let html = '';
-            
-            sections.forEach((section, sectionIndex) => {
-                if (sectionIndex === 0 || (currentCategory === 'player' && sectionIndex < 4)) {
-                    html += `
-                        <div class="section">
-                            <div class="section-title">
-                                <i class="${icons[sectionIndex]}"></i>
-                                ${section}
-                            </div>
-                            <div class="feature-list">
-                    `;
-                    
-                    const sectionFeatures = sectionIndex === 0 ? features : (data[Object.keys(data)[sectionIndex]] || []);
-                    
-                    sectionFeatures.forEach((feature, index) => {
-                        html += `
-                            <div class="feature-item">
-                                <div style="flex: 1;">
-                                    <div class="feature-name">${feature.name}</div>
-                                    <div class="feature-description">${feature.description}</div>
-                                </div>
-                                <div class="feature-status ${feature.status === 'safe' ? 'status-safe' : 'status-risk'}">
-                                    ${feature.status === 'safe' ? 'Safe' : 'Risco'}
-                                </div>
-                                <div class="feature-toggle ${feature.enabled ? 'active' : ''}" 
-                                     onclick="toggleFeature('${currentCategory}', '${currentTab}', ${index})">
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    html += '</div></div>';
-                }
-            });
-            
-            contentArea.innerHTML = html;
-        }
-        
-        // Event listeners
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                currentCategory = this.dataset.category;
-                renderContent();
-            });
-        });
-        
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                currentTab = this.dataset.tab;
-                renderContent();
-            });
-        });
-        
-        // Busca
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            // Implementar busca aqui
-        });
-        
         // Receber mensagens do Lua
         window.addEventListener('message', function(event) {
             try {
-            const data = event.data;
+                const data = event.data;
                 
                 if (data.action === 'showMenu') {
-                    // Mostrar menu completo
-                    document.getElementById('menuContainer').style.display = 'block';
-                    console.log('Menu completo aberto');
+                    // Mostrar infobox
+                    document.getElementById('infoboxContainer').style.display = 'flex';
+                    console.log('InfoBox aberta');
                 }
                 else if (data.action === 'showSimpleInfobox') {
-                    // Mostrar infobox simples (não implementado ainda)
-                    console.log('Infobox simples:', data.message);
-            }
-            else if (data.action === 'closeInfobox') {
+                    // Mostrar infobox simples
+                    document.getElementById('infoboxContainer').style.display = 'flex';
+                    console.log('InfoBox simples:', data.message);
+                }
+                else if (data.action === 'closeInfobox') {
                     closeMenu();
                 }
             } catch (e) {
@@ -609,9 +322,6 @@
                 closeMenu();
             }
         });
-        
-        // Inicializar
-        renderContent();
     </script>
 </body>
 </html>
