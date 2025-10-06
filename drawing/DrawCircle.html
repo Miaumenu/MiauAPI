@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiauDrawing API</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        html, body { 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background: transparent; 
+        }
+        
+        #drawingCanvas {
+            position: absolute;
+            top: 0; 
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            pointer-events: none;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="drawingCanvas"></canvas>
+    
+    <script>
+        // Sistema MiauDrawing
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let shapes = [];
+        let isReady = false;
+        
+        // Configurações
+        function init() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            startRenderLoop();
+            setReady();
+        }
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        function setReady() {
+            isReady = true;
+            if (window.parent !== window) {
+                window.parent.postMessage({ 
+                    action: 'drawingReady',
+                    status: 'success'
+                }, '*');
+            }
+            console.log('MiauDrawing: Sistema pronto!');
+        }
+        
+        // Funções de desenho
+        function drawCircle(x, y, radius, segments, thickness, r, g, b, a, filled) {
+            const screenX = x * canvas.width;
+            const screenY = y * canvas.height;
+            const screenRadius = radius * Math.min(canvas.width, canvas.height);
+            
+            shapes.push({
+                type: 'circle',
+                x: screenX,
+                y: screenY,
+                radius: screenRadius,
+                thickness: thickness,
+                color: { r, g, b, a },
+                filled: filled,
+                id: Date.now() + Math.random()
+            });
+        }
+        
+        function clearShapes() {
+            shapes = [];
+        }
+        
+        function renderCircle(shape) {
+            ctx.beginPath();
+            ctx.arc(shape.x, shape.y, shape.radius, 0, 2 * Math.PI);
+            
+            if (shape.filled) {
+                ctx.fillStyle = `rgba(${shape.color.r}, ${shape.color.g}, ${shape.color.b}, ${shape.color.a/255})`;
+                ctx.fill();
+            } else {
+                ctx.strokeStyle = `rgba(${shape.color.r}, ${shape.color.g}, ${shape.color.b}, ${shape.color.a/255})`;
+                ctx.lineWidth = shape.thickness;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+        }
+        
+        // Loop de renderização
+        function startRenderLoop() {
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                shapes.forEach(shape => {
+                    if (shape.type === 'circle') {
+                        renderCircle(shape);
+                    }
+                });
+                
+                requestAnimationFrame(render);
+            }
+            render();
+        }
+        
+        // Ouvir mensagens do FiveM
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            
+            if (data.action === 'drawCircle') {
+                drawCircle(
+                    data.x, data.y, data.radius, data.segments,
+                    data.thickness, data.r, data.g, data.b, data.a, data.filled
+                );
+                
+                // Confirmar recebimento
+                if (window.parent !== window) {
+                    window.parent.postMessage({ 
+                        action: 'drawCircleReceived',
+                        success: true 
+                    }, '*');
+                }
+            }
+            else if (data.action === 'clearDrawings') {
+                clearShapes();
+                
+                if (window.parent !== window) {
+                    window.parent.postMessage({ 
+                        action: 'clearDrawingsReceived',
+                        success: true 
+                    }, '*');
+                }
+            }
+        });
+        
+        // Inicializar quando a página carregar
+        window.addEventListener('load', init);
+        
+        // Também tentar inicializar se já estiver carregado
+        if (document.readyState === 'complete') {
+            init();
+        }
+    </script>
+</body>
+</html>
