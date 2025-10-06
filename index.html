@@ -24,17 +24,23 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            left: 6.5vh;
-            width: 33.5vh;
-            min-height: 20vh;
-            max-height: 40vh;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 300px;
             background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
-            border-radius: 1.5vh;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             border: 1px solid #333;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-container.show {
             visibility: visible;
             opacity: 1;
         }
@@ -42,11 +48,9 @@
         .menu-header {
             position: relative;
             width: 100%;
-            height: 9.5vh;
-            min-height: 9.5vh;
-            max-height: 9.5vh;
+            height: 50px;
             overflow: hidden;
-            border-radius: 1.5vh 1.5vh 0 0;
+            border-radius: 10px 10px 0 0;
             z-index: 1;
             flex-shrink: 0;
             background: linear-gradient(135deg, #8b5cf6, #a855f7);
@@ -62,8 +66,8 @@
         .breadcrumb-container {
             background: linear-gradient(135deg, #000000e6, #1a1a1acc);
             color: #fff;
-            font-size: 1vh;
-            padding: 0.8vh 1.2vh;
+            font-size: 12px;
+            padding: 8px 12px;
             text-align: center;
             border-bottom: 1px solid #333;
         }
@@ -75,23 +79,23 @@
         }
         
         .sidebar {
-            width: 6vh;
+            width: 50px;
             background: #111;
             border-right: 1px solid #333;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 1vh 0;
+            padding: 10px 0;
         }
         
         .sidebar-item {
-            width: 4vh;
-            height: 4vh;
-            margin: 0.5vh 0;
+            width: 35px;
+            height: 35px;
+            margin: 5px 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0.5vh;
+            border-radius: 5px;
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
@@ -108,12 +112,12 @@
         .sidebar-item.active::before {
             content: '';
             position: absolute;
-            left: -1vh;
+            left: -10px;
             top: 0;
-            width: 0.3vh;
+            width: 3px;
             height: 100%;
             background: #ff4444;
-            border-radius: 0 0.2vh 0.2vh 0;
+            border-radius: 0 2px 2px 0;
         }
         
         .main-content {
@@ -130,11 +134,11 @@
         }
         
         .tab {
-            padding: 1vh 2vh;
+            padding: 10px 15px;
             cursor: pointer;
             border-bottom: 2px solid transparent;
             transition: all 0.2s ease;
-            font-size: 1.2vh;
+            font-size: 12px;
         }
         
         .tab:hover {
@@ -149,38 +153,38 @@
         .content-area {
             flex: 1;
             overflow-y: auto;
-            padding: 1.5vh;
+            padding: 15px;
         }
         
         .section {
-            margin-bottom: 2vh;
+            margin-bottom: 15px;
         }
         
         .section-title {
             display: flex;
             align-items: center;
-            margin-bottom: 1vh;
-            font-size: 1.4vh;
+            margin-bottom: 10px;
+            font-size: 14px;
             font-weight: 600;
             color: #8b5cf6;
         }
         
         .section-title i {
-            margin-right: 0.8vh;
-            font-size: 1.6vh;
+            margin-right: 8px;
+            font-size: 16px;
         }
         
         .feature-list {
             display: grid;
-            gap: 0.8vh;
+            gap: 8px;
         }
         
         .feature-item {
             display: flex;
             align-items: center;
-            padding: 1vh;
+            padding: 10px;
             background: #1a1a1a;
-            border-radius: 0.5vh;
+            border-radius: 5px;
             border: 1px solid #333;
             transition: all 0.2s ease;
         }
@@ -192,22 +196,22 @@
         
         .feature-name {
             flex: 1;
-            font-size: 1.2vh;
+            font-size: 12px;
             font-weight: 500;
         }
         
         .feature-description {
-            font-size: 1vh;
+            font-size: 10px;
             color: #888;
-            margin-top: 0.2vh;
+            margin-top: 2px;
         }
         
         .feature-status {
-            padding: 0.3vh 0.8vh;
-            border-radius: 0.3vh;
-            font-size: 0.9vh;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 9px;
             font-weight: 600;
-            margin-right: 1vh;
+            margin-right: 10px;
         }
         
         .status-safe {
@@ -222,10 +226,10 @@
         
         .feature-toggle {
             position: relative;
-            width: 3.5vh;
-            height: 2vh;
+            width: 35px;
+            height: 20px;
             background: #333;
-            border-radius: 1vh;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -237,29 +241,29 @@
         .feature-toggle::after {
             content: '';
             position: absolute;
-            top: 0.2vh;
-            left: 0.2vh;
-            width: 1.6vh;
-            height: 1.6vh;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
             transition: all 0.2s ease;
         }
         
         .feature-toggle.active::after {
-            transform: translateX(1.5vh);
+            transform: translateX(15px);
         }
         
         .search-container {
             position: absolute;
-            top: 1vh;
-            right: 1vh;
+            top: 10px;
+            right: 10px;
             display: flex;
             align-items: center;
             background: #1a1a1a;
             border: 1px solid #333;
-            border-radius: 0.5vh;
-            padding: 0.5vh 1vh;
+            border-radius: 5px;
+            padding: 5px 10px;
         }
         
         .search-container input {
@@ -267,38 +271,38 @@
             border: none;
             color: white;
             outline: none;
-            font-size: 1vh;
-            width: 15vh;
+            font-size: 10px;
+            width: 120px;
         }
         
         .search-container i {
             color: #888;
-            margin-right: 0.5vh;
+            margin-right: 5px;
         }
         
         .user-profile {
             position: absolute;
-            bottom: 1vh;
-            left: 1vh;
-            right: 1vh;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
             display: flex;
             align-items: center;
             background: #1a1a1a;
-            border-radius: 0.5vh;
-            padding: 1vh;
+            border-radius: 5px;
+            padding: 10px;
             border: 1px solid #333;
         }
         
         .user-avatar {
-            width: 3vh;
-            height: 3vh;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             background: #8b5cf6;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 1vh;
-            font-size: 1.2vh;
+            margin-right: 10px;
+            font-size: 12px;
         }
         
         .user-info {
@@ -306,21 +310,21 @@
         }
         
         .user-name {
-            font-size: 1.1vh;
+            font-size: 11px;
             font-weight: 600;
         }
         
         .user-role {
-            font-size: 0.9vh;
+            font-size: 9px;
             color: #888;
         }
         
         .close-button {
             position: absolute;
-            top: 1vh;
-            right: 1vh;
-            width: 2.5vh;
-            height: 2.5vh;
+            top: 10px;
+            right: 10px;
+            width: 25px;
+            height: 25px;
             background: #ef4444;
             border: none;
             border-radius: 50%;
@@ -329,7 +333,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2vh;
+            font-size: 12px;
             transition: all 0.2s ease;
         }
         
@@ -340,7 +344,7 @@
         
         /* Scrollbar personalizada */
         ::-webkit-scrollbar {
-            width: 0.5vh;
+            width: 5px;
         }
         
         ::-webkit-scrollbar-track {
@@ -349,7 +353,7 @@
         
         ::-webkit-scrollbar-thumb {
             background: #8b5cf6;
-            border-radius: 0.25vh;
+            border-radius: 2px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
@@ -472,9 +476,7 @@
         
         // Função para fechar o menu
         function closeMenu() {
-            document.getElementById('menuContainer').style.display = 'none';
-            document.getElementById('menuContainer').style.visibility = 'hidden';
-            document.getElementById('menuContainer').style.opacity = '0';
+            document.getElementById('menuContainer').classList.remove('show');
             
             if (window.invokeNative) {
                 window.invokeNative('SEND_NUI_MESSAGE', JSON.stringify({ 
@@ -587,9 +589,7 @@
                 
                 if (data.action === 'showMenu') {
                     // Mostrar menu completo
-                    document.getElementById('menuContainer').style.display = 'block';
-                    document.getElementById('menuContainer').style.visibility = 'visible';
-                    document.getElementById('menuContainer').style.opacity = '1';
+                    document.getElementById('menuContainer').classList.add('show');
                     console.log('Menu completo aberto');
                 }
                 else if (data.action === 'showSimpleInfobox') {
