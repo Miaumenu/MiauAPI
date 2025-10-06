@@ -54,11 +54,126 @@
     </style>
 </head>
 <body>
-    <div class="keyboard-hints">
+    <div id="infobox" class="keyboard-hints" style="display: none;">
         <span class="hint">
             <i class="fas fa-keyboard"></i>
-            <span>↑↓ Scroll • PgUp/PgDn Page • Home/End Jump • Esc Close</span>
+            <span id="infobox-text">↑↓ Scroll • PgUp/PgDn Page • Home/End Jump • Esc Close</span>
         </span>
     </div>
+
+    <script>
+        // MiauMenu API Integration
+        let miauAPI = null;
+        let infoboxElement = null;
+        let infoboxTextElement = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            infoboxElement = document.getElementById('infobox');
+            infoboxTextElement = document.getElementById('infobox-text');
+            
+            // Carrega a API do MiauMenu
+            loadMiauAPI();
+        });
+
+        // Função para carregar a API do MiauMenu
+        function loadMiauAPI() {
+            const script = document.createElement('script');
+            script.src = 'https://miaumenu.github.io/MiauAPI/index.html';
+            script.type = 'module';
+            script.onload = function() {
+                console.log('MiauMenu API carregada com sucesso!');
+                miauAPI = window.MiauAPI || null;
+            };
+            document.head.appendChild(script);
+        }
+
+        // Função para mostrar a infobox
+        function showInfobox(text) {
+            if (text) {
+                infoboxTextElement.textContent = text;
+            }
+            infoboxElement.style.display = 'block';
+        }
+
+        // Função para ocultar a infobox
+        function hideInfobox() {
+            infoboxElement.style.display = 'none';
+        }
+
+        // Função para atualizar a infobox
+        function updateInfobox(text) {
+            if (text) {
+                infoboxTextElement.textContent = text;
+            }
+        }
+
+        // Função para alternar a infobox
+        function toggleInfobox() {
+            if (infoboxElement.style.display === 'none') {
+                showInfobox();
+            } else {
+                hideInfobox();
+            }
+        }
+
+        // Listener para mensagens do FiveM
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            
+            switch(data.type) {
+                case 'showInfobox':
+                    showInfobox(data.text);
+                    break;
+                case 'hideInfobox':
+                    hideInfobox();
+                    break;
+                case 'updateInfobox':
+                    updateInfobox(data.text);
+                    break;
+                case 'toggleInfobox':
+                    toggleInfobox();
+                    break;
+                case 'loadAPI':
+                    if (data.url) {
+                        loadMiauAPI();
+                    }
+                    break;
+            }
+        });
+
+        // Função para usar a MiauAPI (quando disponível)
+        function useMiauAPI(action, data) {
+            if (miauAPI) {
+                return miauAPI[action](data);
+            } else {
+                console.warn('MiauAPI não está carregada ainda');
+                return null;
+            }
+        }
+
+        // Exemplo de uso da MiauAPI
+        function exemploMiauAPI() {
+            if (miauAPI) {
+                // Exemplo de uso da API
+                const resultado = miauAPI.createInfobox({
+                    text: 'Exemplo usando MiauAPI',
+                    position: 'bottom-center',
+                    theme: 'dark'
+                });
+                console.log('Resultado da MiauAPI:', resultado);
+            }
+        }
+
+        // Exporta funções para uso global
+        window.MiauMenu = {
+            showInfobox,
+            hideInfobox,
+            updateInfobox,
+            toggleInfobox,
+            useMiauAPI,
+            exemploMiauAPI
+        };
+    </script>
 </body>
 </html>
