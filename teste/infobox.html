@@ -1,80 +1,198 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiauAPI Notifications</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sistema de Notificações</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <style>
-        /* Seus estilos CSS existentes */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: transparent; overflow: hidden; }
-        /* ... (mantenha todos os seus estilos atuais) ... */
+        /* (mantive seu CSS; pequenos ajustes) */
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%;background:transparent;font-family:'Inter',sans-serif;overflow:hidden}
+        #app{width:100vw;height:100vh;background:transparent}
+        .notification-container{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:9999;pointer-events:none;max-width:320px;overflow:visible}
+        .notification{width:280px;height:auto;min-height:56px;background:var(--notification-bg);color:#fff;border-radius:7px;font-family:'Inter',sans-serif;box-shadow:var(--notification-shadow);text-align:left;pointer-events:auto;transition:all .4s cubic-bezier(.4,0,.2,1);border:1px solid var(--notification-border);position:relative;overflow:hidden;display:flex;align-items:center;padding:8px}
+        .notification-icon-wrapper{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--notification-accent);box-shadow:var(--notification-accent-shadow);border-radius:6px;flex-shrink:0;margin-left:8px;margin-right:8px}
+        .notification-content{flex:1;display:flex;flex-direction:column;gap:2px}
+        .notification-message{font-size:12px;font-weight:600;line-height:14px;color:#fff;word-wrap:break-word}
+        .notification-meta{font-size:10px;opacity:0.85}
+        .notification.info{--notification-bg:linear-gradient(97.75deg, rgba(47,47,47,0.19) -3.82%, rgba(0,170,255,0.14) 104.72%);--notification-border:rgba(0,170,255,0.61);--notification-shadow:0px 0px 4px 2px rgba(0,170,255,0.25);--notification-accent:#00AAFF;--notification-accent-shadow:0 0 4px 2px rgba(0,170,255,0.61)}
+        .notification.success{--notification-bg:linear-gradient(97.75deg, rgba(47,47,47,0.19) -3.82%, rgba(17,255,0,0.14) 104.72%);--notification-border:rgba(17,255,0,0.61);--notification-shadow:0 0 4px rgba(17,255,0,0.25);--notification-accent:#11FF00;--notification-accent-shadow:0 0 4px 2px rgba(17,255,0,0.25)}
+        .notification.warn{--notification-bg:linear-gradient(97.75deg, rgba(47,47,47,0.19) -3.82%, rgba(238,255,0,0.14) 104.72%);--notification-border:rgba(238,255,0,0.61);--notification-shadow:0 0 4px 2px rgba(238,255,0,0.25);--notification-accent:#EEFF00;--notification-accent-shadow:0 0 4px 2px rgba(238,255,0,0.61)}
+        .notification.error{--notification-bg:linear-gradient(97.75deg, rgba(47,47,47,0.19) -3.82%, rgba(255,0,0,0.14) 104.72%);--notification-border:rgba(255,0,0,0.61);--notification-shadow:0 0 4px 2px rgba(255,0,0,0.25);--notification-accent:#FF0000;--notification-accent-shadow:0 0 4px 2px rgba(255,0,0,0.25)}
+        .notification.loading{--notification-bg:linear-gradient(97.75deg, rgba(47,47,47,0.19) -3.82%, rgba(255,255,255,0.14) 104.72%);--notification-border:rgba(255,255,255,0.61);--notification-shadow:0 0 4px 2px rgba(255,255,255,0.25);--notification-accent:#FFFFFF;--notification-accent-shadow:0 0 4px 2px rgba(255,255,255,0.61)}
+        @keyframes notification-slide-in{0%{transform:translateX(100%);opacity:0}100%{transform:translateX(0);opacity:1}}
+        @keyframes notification-slide-out{0%{transform:translateX(0);opacity:1}100%{transform:translateX(100%);opacity:0}}
+        .notification-enter{animation:notification-slide-in .36s cubic-bezier(.4,0,.2,1)}
+        .notification-exit{animation:notification-slide-out .28s cubic-bezier(.4,0,.2,1)}
     </style>
 </head>
 <body>
     <div id="app">
-        <div class="notification-container">
-            <transition-group name="notification">
-                <div v-for="notification in notifications" 
-                     :key="notification.id"
-                     :class="['notification', notification.type]">
-                    <div class="notification-icon-wrapper"></div>
-                    <div class="notification-content">
-                        <div class="notification-message">{{ notification.message }}</div>
-                    </div>
-                </div>
-            </transition-group>
-        </div>
+        <div class="notification-container" id="notificationContainer" data-position="top-right"></div>
     </div>
 
     <script>
-        // 7. SISTEMA VUE.JS PARA NOTIFICAÇÕES
-        const { createApp } = Vue;
-        
-        createApp({
-            data() {
-                return {
-                    notifications: []
-                }
-            },
-            methods: {
-                showNotification(message, type = 'info', duration = 5000) {
-                    const id = Date.now() + Math.random();
-                    const notification = {
-                        id,
-                        message,
-                        type,
-                        duration
-                    };
-                    
-                    this.notifications.push(notification);
-                    
-                    setTimeout(() => {
-                        this.removeNotification(id);
-                    }, duration);
-                },
-                removeNotification(id) {
-                    this.notifications = this.notifications.filter(n => n.id !== id);
-                },
-                clearAll() {
-                    this.notifications = [];
-                }
-            },
-            mounted() {
-                // Ouvir mensagens do FiveM
-                window.addEventListener('message', (event) => {
-                    const data = event.data;
-                    if (data.action === 'show') {
-                        this.showNotification(data.message, data.type, data.duration);
-                    }
-                });
-                
-                // Notificar que o Vue.js está carregado
-                console.log('MiauAPI Vue.js Notifications loaded');
+    (function(){
+        // Sistema de notificação simples
+        class NotificationSystem {
+            constructor(container){
+                this.container = container;
+                this.notifications = new Map();
+                this.maxVisible = 6;
             }
-        }).mount('#app');
+
+            _generateId(){
+                return `${Date.now()}_${Math.floor(Math.random()*100000)}`;
+            }
+
+            show(message, duration = 5000, size = 'medium', position = 'top-right', level = 'info'){
+                // Normalize level: accept 'warning' -> 'warn'
+                if(level === 'warning') level = 'warn';
+                const id = this._generateId();
+                const type = level; // info, success, warn, error, loading
+                const notif = this._createNotificationElement(id, message, type, duration, size);
+                // Insert into DOM
+                if(this.container.childElementCount >= this.maxVisible){
+                    // remove the oldest
+                    const first = this.container.firstElementChild;
+                    if(first && first.dataset && first.dataset.id){
+                        this.remove(first.dataset.id);
+                    }
+                }
+                this.container.appendChild(notif);
+                this.notifications.set(id, { el: notif, timeout: null });
+                // Trigger enter animation
+                requestAnimationFrame(()=> notif.classList.add('notification-enter'));
+
+                // Auto remove if duration > 0
+                if(duration > 0){
+                    const to = setTimeout(()=> this.remove(id), duration);
+                    this.notifications.get(id).timeout = to;
+                }
+                return id;
+            }
+
+            _createNotificationElement(id, message, type, duration, size){
+                const wrapper = document.createElement('div');
+                wrapper.className = `notification ${type}`;
+                wrapper.dataset.id = id;
+                wrapper.setAttribute('role','status');
+                wrapper.setAttribute('aria-live','polite');
+
+                const iconWrapper = document.createElement('div');
+                iconWrapper.className = 'notification-icon-wrapper';
+                const icon = document.createElement('i');
+                icon.className = this._getIcon(type) + ' notification-icon';
+                iconWrapper.appendChild(icon);
+
+                const content = document.createElement('div');
+                content.className = 'notification-content';
+                const msg = document.createElement('div');
+                msg.className = 'notification-message';
+                // use textContent to avoid HTML injection
+                msg.textContent = message;
+
+                content.appendChild(msg);
+                wrapper.appendChild(iconWrapper);
+                wrapper.appendChild(content);
+
+                // click to remove
+                wrapper.addEventListener('click', ()=> this.remove(id));
+                return wrapper;
+            }
+
+            _getIcon(type){
+                const icons = {
+                    'info': 'fas fa-info-circle',
+                    'success': 'fas fa-check-circle',
+                    'warn': 'fas fa-exclamation-triangle',
+                    'error': 'fas fa-times-circle',
+                    'loading': 'fas fa-spinner'
+                };
+                return icons[type] || icons['info'];
+            }
+
+            remove(id){
+                const item = this.notifications.get(id);
+                if(!item) return;
+                const el = item.el;
+                if(item.timeout) clearTimeout(item.timeout);
+                el.classList.remove('notification-enter');
+                el.classList.add('notification-exit');
+                setTimeout(()=> {
+                    if(el && el.parentNode) el.parentNode.removeChild(el);
+                }, 300);
+                this.notifications.delete(id);
+            }
+
+            clearAll(){
+                Array.from(this.notifications.keys()).forEach(id => this.remove(id));
+            }
+        }
+
+        // Inicializar
+        const container = document.getElementById('notificationContainer');
+        const notificationSystem = new NotificationSystem(container);
+
+        // Expor API global no padrão solicitado:
+        // MiauAPI.infobox("mensagem", tempo, "tamanho", "posição", "level")
+        window.MiauAPI = window.MiauAPI || {};
+        window.MiauAPI.infobox = function(message, tempo = 5000, tamanho = 'medium', pos = 'top-right', level = 'info'){
+            // Normalize params
+            try {
+                if(typeof message !== 'string') message = String(message);
+            } catch(e){ message = '' }
+            // Show notification
+            return notificationSystem.show(message, tempo, tamanho, pos, level);
+        };
+
+        // Also expose the instance for debug
+        window.notificationSystem = notificationSystem;
+
+        // Listener para receber mensagens do FiveM (SendDuiMessage)
+        window.addEventListener('message', function(event){
+            // event.data pode ser string JSON ou objeto
+            let data = event.data;
+            try {
+                if(typeof data === 'string') data = JSON.parse(data);
+            } catch(e){ /* ignore */ }
+
+            if(!data || !data.action) return;
+
+            switch(data.action){
+                case 'notify': {
+                    const msg = data.message || '';
+                    const type = data.type || 'info';
+                    const dur = typeof data.duration === 'number' ? data.duration : 5000;
+                    const size = data.size || 'medium';
+                    const pos = data.position || 'top-right';
+                    // Accept both 'warning' and 'warn' from Lua
+                    const level = data.level || type;
+                    notificationSystem.show(msg, dur, size, pos, level);
+                    break;
+                }
+                case 'clearNotifications': {
+                    notificationSystem.clearAll();
+                    break;
+                }
+                case 'setVisible': {
+                    const v = !!data.visible;
+                    document.getElementById('app').style.opacity = v ? '1' : '0';
+                    break;
+                }
+                default:
+                    // Unknown action
+                    break;
+            }
+        }, false);
+
+        // Demo (remova em produção)
+        // setTimeout(()=> window.MiauAPI.infobox('Info: Menu injetado com sucesso!', 5000, 'medium','top-right','info'), 1000);
+    })();
     </script>
 </body>
 </html>
