@@ -4,222 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MiauAPI Notifications</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            background: transparent;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        #app {
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            position: relative;
-        }
-
-        .notification-container {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-            z-index: 9999;
-            pointer-events: none;
-            max-width: 280px;
-        }
-
-        .notification {
-            width: 248px;
-            height: 58px;
-            background: var(--notification-bg);
-            color: #fff;
-            border-radius: 7px;
-            font-family: 'Inter', sans-serif;
-            box-shadow: var(--notification-shadow);
-            text-align: left;
-            pointer-events: auto;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid var(--notification-border);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            gap: 0;
-            padding: 0;
-        }
-
-        .notification-icon-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 3px;
-            height: 46px;
-            background: var(--notification-accent);
-            box-shadow: var(--notification-accent-shadow);
-            border-radius: 7px;
-            flex-shrink: 0;
-            margin-left: 6px;
-        }
-
-        .notification-content {
-            padding: 10px 15px;
-            position: relative;
-            z-index: 2;
-            flex: 1;
-            display: flex;
-            align-items: center;
-        }
-
-        .notification-message {
-            font-size: 10px;
-            font-weight: 600;
-            line-height: 12px;
-            letter-spacing: -0.02em;
-            color: #FFFFFF;
-            word-wrap: break-word;
-        }
-
-        /* Tipos de notificação */
-        .notification.info {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(0, 170, 255, 0.1407) 104.72%);
-            --notification-border: rgba(0, 170, 255, 0.61);
-            --notification-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.25);
-            --notification-accent: #00AAFF;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.61);
-        }
-
-        .notification.success {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(17, 255, 0, 0.1407) 104.72%);
-            --notification-border: rgba(17, 255, 0, 0.61);
-            --notification-shadow: 0px 0px 4px rgba(17, 255, 0, 0.25);
-            --notification-accent: #11FF00;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(17, 255, 0, 0.25);
-        }
-
-        .notification.warn {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(238, 255, 0, 0.1407) 104.72%);
-            --notification-border: rgba(238, 255, 0, 0.61);
-            --notification-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.25);
-            --notification-accent: #EEFF00;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.61);
-        }
-
-        .notification.error {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 0, 0, 0.1407) 104.72%);
-            --notification-border: rgba(255, 0, 0, 0.61);
-            --notification-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
-            --notification-accent: #FF0000;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
-        }
-
-        /* Animações */
-        .notification-enter {
-            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes slideIn {
-            0% { transform: translateX(100%); opacity: 0; }
-            100% { transform: translateX(0); opacity: 1; }
-        }
-
-        .notification-exit {
-            animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes slideOut {
-            0% { transform: translateX(0); opacity: 1; }
-            100% { transform: translateX(100%); opacity: 0; }
-        }
+        /* Seus estilos CSS existentes */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: transparent; overflow: hidden; }
+        /* ... (mantenha todos os seus estilos atuais) ... */
     </style>
 </head>
 <body>
     <div id="app">
-        <div class="notification-container" id="notificationContainer"></div>
+        <div class="notification-container">
+            <transition-group name="notification">
+                <div v-for="notification in notifications" 
+                     :key="notification.id"
+                     :class="['notification', notification.type]">
+                    <div class="notification-icon-wrapper"></div>
+                    <div class="notification-content">
+                        <div class="notification-message">{{ notification.message }}</div>
+                    </div>
+                </div>
+            </transition-group>
+        </div>
     </div>
 
     <script>
-        class NotificationSystem {
-            constructor() {
-                this.container = document.getElementById('notificationContainer');
-                this.notifications = new Map();
-            }
-
-            show(message, type = 'info', duration = 5000) {
-                const id = Date.now() + Math.random();
-                const notification = this.createNotification(id, message, type);
-                
-                this.container.appendChild(notification);
-                this.notifications.set(id, notification);
-
-                notification.classList.add('notification-enter');
-
-                setTimeout(() => {
-                    this.remove(id);
-                }, duration);
-
-                return id;
-            }
-
-            createNotification(id, message, type) {
-                const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
-                notification.dataset.id = id;
-
-                notification.innerHTML = `
-                    <div class="notification-icon-wrapper"></div>
-                    <div class="notification-content">
-                        <div class="notification-message">${message}</div>
-                    </div>
-                `;
-
-                return notification;
-            }
-
-            remove(id) {
-                const notification = this.notifications.get(id);
-                if (notification) {
-                    notification.classList.add('notification-exit');
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.parentNode.removeChild(notification);
-                        }
-                        this.notifications.delete(id);
-                    }, 300);
-                }
-            }
-        }
-
-        const notificationSystem = new NotificationSystem();
-
-        // Ouvir mensagens do FiveM
-        window.addEventListener('message', function(event) {
-            const data = event.data;
-            if (data.action === 'show') {
-                notificationSystem.show(data.message, data.type, data.duration);
-            }
-        });
-
-        // Expor globalmente
-        window.notificationSystem = notificationSystem;
+        // 7. SISTEMA VUE.JS PARA NOTIFICAÇÕES
+        const { createApp } = Vue;
         
-        // Notificar que o HTML está pronto
-        if (window.invokeNative) {
-            window.invokeNative('openUrl', 'https://miaumenu.github.io/MiauAPI/loaded');
-        }
+        createApp({
+            data() {
+                return {
+                    notifications: []
+                }
+            },
+            methods: {
+                showNotification(message, type = 'info', duration = 5000) {
+                    const id = Date.now() + Math.random();
+                    const notification = {
+                        id,
+                        message,
+                        type,
+                        duration
+                    };
+                    
+                    this.notifications.push(notification);
+                    
+                    setTimeout(() => {
+                        this.removeNotification(id);
+                    }, duration);
+                },
+                removeNotification(id) {
+                    this.notifications = this.notifications.filter(n => n.id !== id);
+                },
+                clearAll() {
+                    this.notifications = [];
+                }
+            },
+            mounted() {
+                // Ouvir mensagens do FiveM
+                window.addEventListener('message', (event) => {
+                    const data = event.data;
+                    if (data.action === 'show') {
+                        this.showNotification(data.message, data.type, data.duration);
+                    }
+                });
+                
+                // Notificar que o Vue.js está carregado
+                console.log('MiauAPI Vue.js Notifications loaded');
+            }
+        }).mount('#app');
     </script>
 </body>
 </html>
