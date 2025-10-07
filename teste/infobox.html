@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MiauAPI Notificações (Vue)</title>
+  <title>MiauAPI Notificações (Vue.js)</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
@@ -22,37 +22,89 @@
     }
 
     .notify {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-width: 250px;
-      max-width: 320px;
+      gap: 8px;
+      width: 252px;
+      min-height: 58px;
       padding: 10px 14px;
-      border-radius: 8px;
-      color: #fff;
-      backdrop-filter: blur(8px);
-      border: 1px solid transparent;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      background: linear-gradient(0deg, #000000, #000000);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0px 0px 18px 2px rgba(0,0,0,0.4);
+      border-radius: 7px;
+      color: #FFFFFF;
+      overflow: hidden;
       animation: slideIn 0.4s ease;
       pointer-events: all;
     }
 
-    .notify.info     { background: rgba(0,170,255,0.15); border-color: rgba(0,170,255,0.6); }
-    .notify.sucesso  { background: rgba(17,255,0,0.15);  border-color: rgba(17,255,0,0.6); }
-    .notify.erro     { background: rgba(255,0,0,0.15);   border-color: rgba(255,0,0,0.6); }
-    .notify.warning  { background: rgba(255,200,0,0.15); border-color: rgba(255,200,0,0.6); }
+    .notify p {
+      font-weight: 600;
+      font-size: 10px;
+      line-height: 12px;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      margin-left: 8px;
+      text-shadow: 0 0 4px rgba(255,255,255,0.2);
+    }
 
-    .notify i { font-size: 16px; min-width: 20px; text-align: center; }
-    .notify p { font-size: 13px; font-weight: 600; color: #fff; flex: 1; }
+    /* Barrinha lateral colorida */
+    .notify::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 3px;
+      height: 46px;
+      border-radius: 7px;
+      box-shadow: 0px 0px 4px 2px rgba(255,255,255,0.4);
+    }
+
+    /* Cores por tipo */
+    .notify.info {
+      border: 1px solid rgba(0,170,255,0.71);
+      box-shadow: 0px 0px 18px 2px rgba(0,170,255,0.25);
+    }
+    .notify.info::before {
+      background: #00AAFF;
+      box-shadow: 0px 0px 4px 2px rgba(0,170,255,0.61);
+    }
+
+    .notify.sucesso {
+      border: 1px solid rgba(17,255,0,0.71);
+      box-shadow: 0px 0px 18px 2px rgba(17,255,0,0.25);
+    }
+    .notify.sucesso::before {
+      background: #11FF00;
+      box-shadow: 0px 0px 4px 2px rgba(17,255,0,0.61);
+    }
+
+    .notify.erro {
+      border: 1px solid rgba(255,0,0,0.71);
+      box-shadow: 0px 0px 18px 2px rgba(255,0,0,0.25);
+    }
+    .notify.erro::before {
+      background: #FF0000;
+      box-shadow: 0px 0px 4px 2px rgba(255,0,0,0.61);
+    }
+
+    .notify.warning {
+      border: 1px solid rgba(238,255,0,0.71);
+      box-shadow: 0px 0px 18px 2px rgba(238,255,0,0.25);
+    }
+    .notify.warning::before {
+      background: #EEFF00;
+      box-shadow: 0px 0px 4px 2px rgba(238,255,0,0.61);
+    }
 
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
-      to   { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(0); opacity: 1; }
     }
-
     @keyframes slideOut {
       from { transform: translateX(0); opacity: 1; }
-      to   { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(100%); opacity: 0; }
     }
   </style>
 </head>
@@ -65,7 +117,6 @@
              class="notify"
              :class="n.level"
              @click="remove(n.id)">
-          <i>{{ icons[n.level] || "💬" }}</i>
           <p>{{ n.message }}</p>
         </div>
       </TransitionGroup>
@@ -78,13 +129,8 @@
     createApp({
       setup() {
         const notifications = ref([]);
-        const icons = {
-          info: "ℹ️",
-          sucesso: "✅",
-          erro: "❌",
-          warning: "⚠️"
-        };
 
+        // Adiciona uma notificação
         const add = (message, duration = 5000, size = "medium", position = "top-right", level = "info") => {
           const id = Date.now() + Math.random();
           notifications.value.push({ id, message, level });
@@ -94,23 +140,18 @@
           }
         };
 
+        // Remove uma notificação
         const remove = (id) => {
           const idx = notifications.value.findIndex(n => n.id === id);
-          if (idx !== -1) {
-            const el = document.querySelector(`[data-v-key="${notifications.value[idx].id}"]`);
-            notifications.value.splice(idx, 1);
-          }
+          if (idx !== -1) notifications.value.splice(idx, 1);
         };
 
         // Recebe mensagens do Lua via SendDuiMessage
         window.addEventListener("message", (event) => {
           let data = event.data;
-          try {
-            if (typeof data === "string") data = JSON.parse(data);
-          } catch (e) {}
+          try { if (typeof data === "string") data = JSON.parse(data); } catch (e) {}
 
           if (!data || data.action !== "notify") return;
-
           add(
             data.message || "Sem mensagem",
             data.duration || 5000,
@@ -126,7 +167,7 @@
             add(msg, dur, size, pos, level)
         };
 
-        return { notifications, icons, remove };
+        return { notifications, remove };
       }
     }).mount("#app");
   </script>
