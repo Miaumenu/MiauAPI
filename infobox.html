@@ -31,138 +31,130 @@
         /* Container de notificações */
         .notification-container {
             position: fixed;
-            top: 2vh;
-            right: 2vh;
+            top: 20px;
+            right: 20px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 0.8vh;
+            gap: 10px;
             z-index: 9999;
             pointer-events: none;
-            max-width: 35vh;
+            max-width: 280px;
             overflow: visible;
         }
 
         /* Estilo das notificações */
         .notification {
-            min-width: 25vh;
-            max-width: 35vh;
-            background: linear-gradient(135deg, #0f0f0ff2, #191919f2, #0f0f0ff2);
+            width: 248px;
+            height: 58px;
+            background: var(--notification-bg);
             color: #fff;
-            border-radius: 0.8vh;
-            font-family: Inter, Segoe UI, -apple-system, BlinkMacSystemFont, sans-serif;
-            box-shadow: 0 0.5vh 2vh #0006, 0 0 1vh #0003, inset 0 0 0 0.1vh #ffffff1a;
+            border-radius: 7px;
+            font-family: 'Inter', sans-serif;
+            box-shadow: var(--notification-shadow);
             text-align: left;
             pointer-events: auto;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 0.1vh solid var(--notification-color);
+            border: 1px solid var(--notification-border);
             position: relative;
             overflow: hidden;
             transform: translateZ(0);
             will-change: transform, opacity;
-            animation: notification-glow 2s ease-in-out infinite alternate;
             display: flex;
             align-items: center;
-            gap: 0.8vh;
-            padding: 1vh 1.2vh;
+            gap: 0;
+            padding: 0;
         }
 
         .notification-icon-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 2.5vh;
-            height: 2.5vh;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--notification-color) 0%, color-mix(in srgb, var(--notification-color) 80%, white) 100%);
-            box-shadow: 0 0 1vh var(--notification-color), inset 0 0 0.5vh #fff3;
+            width: 3px;
+            height: 46px;
+            background: var(--notification-accent);
+            box-shadow: var(--notification-accent-shadow);
+            border-radius: 7px;
+            flex-shrink: 0;
+            margin-left: 6px;
         }
 
         .notification-icon {
-            font-size: 1.3vh;
-            color: #fff;
-            text-shadow: 0 0 0.5vh rgba(0, 0, 0, 0.5);
+            display: none;
         }
 
         .notification-content {
-            padding: 1vh 1.5vh 1.2vh;
+            padding: 10px 15px;
             position: relative;
             z-index: 2;
+            flex: 1;
+            display: flex;
+            align-items: center;
         }
 
         .notification-message {
-            font-size: 1.3vh;
-            font-weight: 500;
-            line-height: 1.5;
-            color: #fffffff2;
-            margin-bottom: 0.5vh;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 12px;
+            letter-spacing: -0.02em;
+            color: #FFFFFF;
             word-wrap: break-word;
         }
 
         .notification-timestamp {
-            font-size: 1vh;
-            font-weight: 400;
-            color: #ffffff80;
-            font-family: 'JetBrains Mono', Consolas, monospace;
+            display: none;
         }
 
         .notification-close {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 2vh;
-            height: 2vh;
-            border-radius: 50%;
-            background: #ffffff1a;
-            color: #fff9;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1vh;
-        }
-
-        .notification-close:hover {
-            background: #fff3;
-            color: #fff;
-            transform: scale(1.1);
+            display: none;
         }
 
         .notification-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 0.2vh;
-            background: linear-gradient(90deg, var(--notification-color) 0%, color-mix(in srgb, var(--notification-color) 60%, transparent) 100%);
-            border-radius: 0 0 1.2vh 1.2vh;
-            animation: notification-progress 5s linear forwards;
+            display: none;
         }
 
         /* Tipos de notificação */
         .notification.info {
-            --notification-color: #8b5cf6;
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(0, 170, 255, 0.1407) 104.72%);
+            --notification-border: rgba(0, 170, 255, 0.61);
+            --notification-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.25);
+            --notification-accent: #00AAFF;
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.61);
         }
 
         .notification.success {
-            --notification-color: #10b981;
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(17, 255, 0, 0.1407) 104.72%);
+            --notification-border: rgba(17, 255, 0, 0.61);
+            --notification-shadow: 0px 0px 4px rgba(17, 255, 0, 0.25);
+            --notification-accent: #11FF00;
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(17, 255, 0, 0.25);
         }
 
         .notification.warn {
-            --notification-color: #f59e0b;
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(238, 255, 0, 0.1407) 104.72%);
+            --notification-border: rgba(238, 255, 0, 0.61);
+            --notification-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.25);
+            --notification-accent: #EEFF00;
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.61);
         }
 
         .notification.error {
-            --notification-color: #ef4444;
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 0, 0, 0.1407) 104.72%);
+            --notification-border: rgba(255, 0, 0, 0.61);
+            --notification-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
+            --notification-accent: #FF0000;
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
+        }
+
+        .notification.loading {
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 255, 255, 0.1407) 104.72%);
+            --notification-border: rgba(255, 255, 255, 0.61);
+            --notification-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.25);
+            --notification-accent: #FFFFFF;
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.61);
         }
 
         /* Animações */
-        @keyframes notification-glow {
-            0% {
-                box-shadow: 0 0.8vh 3vh #0009, 0 0 2vh #0000004d, inset 0 0 0 0.1vh #ffffff1a, 0 0 1vh var(--notification-color);
-            }
-            100% {
-                box-shadow: 0 0.8vh 3vh #0009, 0 0 2vh #0000004d, inset 0 0 0 0.1vh #ffffff1a, 0 0 2vh var(--notification-color);
-            }
-        }
-
         @keyframes notification-progress {
             0% { width: 100%; }
             100% { width: 0%; }
@@ -237,10 +229,6 @@
                 notification.dataset.id = id;
 
                 const icon = this.getIcon(type);
-                const timestamp = new Date().toLocaleTimeString('pt-BR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
 
                 notification.innerHTML = `
                     <div class="notification-icon-wrapper">
@@ -248,12 +236,7 @@
                     </div>
                     <div class="notification-content">
                         <div class="notification-message">${message}</div>
-                        <div class="notification-timestamp">${timestamp}</div>
                     </div>
-                    <button class="notification-close" onclick="notificationSystem.remove(${id})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="notification-progress"></div>
                 `;
 
                 return notification;
@@ -264,7 +247,8 @@
                     'info': 'fas fa-info-circle',
                     'success': 'fas fa-check-circle',
                     'warn': 'fas fa-exclamation-triangle',
-                    'error': 'fas fa-times-circle'
+                    'error': 'fas fa-times-circle',
+                    'loading': 'fas fa-spinner'
                 };
                 return icons[type] || icons['info'];
             }
@@ -292,10 +276,26 @@
         // Inicializar sistema de notificações
         const notificationSystem = new NotificationSystem();
 
-        // Exemplo de uso - remover em produção
+        // Exemplos de uso
         setTimeout(() => {
-            notificationSystem.show('Sistema de notificações carregado!', 'success', 3000);
+            notificationSystem.show('Info: Menu injetado com sucesso! agora basta configurar qual bind ira abrir o menu.', 'info', 5000);
         }, 1000);
+
+        setTimeout(() => {
+            notificationSystem.show('Warning: Menu injetado com sucesso! agora basta configurar qual bind ira abrir o menu.', 'warn', 5000);
+        }, 2000);
+
+        setTimeout(() => {
+            notificationSystem.show('Loading: Menu injetado com sucesso! agora basta configurar qual bind ira abrir o menu.', 'loading', 5000);
+        }, 3000);
+
+        setTimeout(() => {
+            notificationSystem.show('Error: Não foi possivel utilizar esta função! contate um adiministrador ou abra ticket em nosso discord!', 'error', 5000);
+        }, 4000);
+
+        setTimeout(() => {
+            notificationSystem.show('Sucesso: Teleporte para a localização personalizada feita com exito!', 'success', 5000);
+        }, 5000);
 
         // Expor para uso global
         window.notificationSystem = notificationSystem;
