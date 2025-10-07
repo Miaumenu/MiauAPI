@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Notificações</title>
+    <title>MiauAPI Notifications</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -22,67 +23,26 @@
         }
 
         #app {
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             background: transparent;
+            position: relative;
         }
 
         .notification-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 10px;
+            gap: 8px;
             z-index: 9999;
             pointer-events: none;
             max-width: 280px;
-            overflow: visible;
-        }
-
-        /* Posições do container */
-        .notification-container.top-left {
-            top: 20px;
-            left: 20px;
-            right: auto;
-            align-items: flex-start;
-        }
-
-        .notification-container.top-right {
-            top: 20px;
-            right: 20px;
-            left: auto;
-            align-items: flex-end;
-        }
-
-        .notification-container.bottom-left {
-            bottom: 20px;
-            left: 20px;
-            top: auto;
-            right: auto;
-            align-items: flex-start;
-        }
-
-        .notification-container.bottom-right {
-            bottom: 20px;
-            right: 20px;
-            top: auto;
-            left: auto;
-            align-items: flex-end;
-        }
-
-        .notification-container.center {
-            top: 50%;
-            left: 50%;
-            right: auto;
-            bottom: auto;
-            transform: translate(-50%, -50%);
-            align-items: center;
         }
 
         .notification {
-            box-sizing: border-box;
             width: 248px;
             height: 58px;
             background: var(--notification-bg);
@@ -96,38 +56,10 @@
             border: 1px solid var(--notification-border);
             position: relative;
             overflow: hidden;
-            transform: translateZ(0);
-            will-change: transform, opacity;
             display: flex;
             align-items: center;
             gap: 0;
             padding: 0;
-        }
-
-        /* Tamanhos de notificação */
-        .notification.small {
-            width: 200px;
-            height: 45px;
-        }
-
-        .notification.small .notification-message {
-            font-size: 9px;
-            line-height: 11px;
-        }
-
-        .notification.medium {
-            width: 248px;
-            height: 58px;
-        }
-
-        .notification.large {
-            width: 320px;
-            height: 75px;
-        }
-
-        .notification.large .notification-message {
-            font-size: 12px;
-            line-height: 14px;
         }
 
         .notification-icon-wrapper {
@@ -153,79 +85,64 @@
         }
 
         .notification-message {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 600;
             font-size: 10px;
+            font-weight: 600;
             line-height: 12px;
             letter-spacing: -0.02em;
             color: #FFFFFF;
             word-wrap: break-word;
         }
 
-        /* Tipos de notificação com a camada preta adicionada */
+        /* Tipos de notificação */
         .notification.info {
-            --notification-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.73), rgba(0, 0, 0, 0.73)), linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(0, 170, 255, 0.1407) 104.72%);
-            --notification-border: rgba(0, 170, 255, 0.71);
-            --notification-shadow: 0px 0px 18px 2px rgba(0, 170, 255, 0.25);
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(0, 170, 255, 0.1407) 104.72%);
+            --notification-border: rgba(0, 170, 255, 0.61);
+            --notification-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.25);
             --notification-accent: #00AAFF;
             --notification-accent-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.61);
         }
 
         .notification.success {
-            --notification-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.73), rgba(0, 0, 0, 0.73)), linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(17, 255, 0, 0.1407) 104.72%);
-            --notification-border: rgba(17, 255, 0, 0.71);
-            --notification-shadow: 0px 0px 18px 2px rgba(17, 255, 0, 0.25);
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(17, 255, 0, 0.1407) 104.72%);
+            --notification-border: rgba(17, 255, 0, 0.61);
+            --notification-shadow: 0px 0px 4px rgba(17, 255, 0, 0.25);
             --notification-accent: #11FF00;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(17, 255, 0, 0.61);
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(17, 255, 0, 0.25);
         }
 
         .notification.warn {
-            --notification-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.73), rgba(0, 0, 0, 0.73)), linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(238, 255, 0, 0.1407) 104.72%);
-            --notification-border: rgba(238, 255, 0, 0.71);
-            --notification-shadow: 0px 0px 18px 2px rgba(238, 255, 0, 0.25);
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(238, 255, 0, 0.1407) 104.72%);
+            --notification-border: rgba(238, 255, 0, 0.61);
+            --notification-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.25);
             --notification-accent: #EEFF00;
             --notification-accent-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.61);
         }
 
         .notification.error {
-            --notification-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.73), rgba(0, 0, 0, 0.73)), linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 0, 0, 0.1407) 104.72%);
-            --notification-border: rgba(255, 0, 0, 0.71);
-            --notification-shadow: 0px 0px 18px 2px rgba(255, 0, 0, 0.25);
+            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 0, 0, 0.1407) 104.72%);
+            --notification-border: rgba(255, 0, 0, 0.61);
+            --notification-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
             --notification-accent: #FF0000;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.61);
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
         }
 
-        /* Animação de entrada */
+        /* Animações */
         .notification-enter {
-            animation: notification-slide-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes notification-slide-in {
-            0% {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        @keyframes slideIn {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
         }
 
-        /* Animação de saída */
         .notification-exit {
-            animation: notification-slide-out 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes notification-slide-out {
-            0% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateX(100%);
-                opacity: 0;
-            }
+        @keyframes slideOut {
+            0% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
         }
     </style>
 </head>
@@ -239,17 +156,11 @@
             constructor() {
                 this.container = document.getElementById('notificationContainer');
                 this.notifications = new Map();
-                this.currentPosition = 'top-right';
-                this.currentSize = 'medium';
             }
 
-            infobox(message, level = 'info', tempo = 5000, tamanho = 'medium', posicao = 'top-right') {
+            show(message, type = 'info', duration = 5000) {
                 const id = Date.now() + Math.random();
-                
-                // Atualizar posição do container se necessário
-                this.updateContainerPosition(posicao);
-                
-                const notification = this.createNotification(id, message, level, tamanho);
+                const notification = this.createNotification(id, message, type);
                 
                 this.container.appendChild(notification);
                 this.notifications.set(id, notification);
@@ -258,21 +169,14 @@
 
                 setTimeout(() => {
                     this.remove(id);
-                }, tempo);
+                }, duration);
 
                 return id;
             }
 
-            updateContainerPosition(posicao) {
-                if (posicao !== this.currentPosition) {
-                    this.container.className = `notification-container ${posicao}`;
-                    this.currentPosition = posicao;
-                }
-            }
-
-            createNotification(id, message, type, tamanho = 'medium') {
+            createNotification(id, message, type) {
                 const notification = document.createElement('div');
-                notification.className = `notification ${type} ${tamanho}`;
+                notification.className = `notification ${type}`;
                 notification.dataset.id = id;
 
                 notification.innerHTML = `
@@ -297,59 +201,25 @@
                     }, 300);
                 }
             }
-
-            clear() {
-                this.notifications.forEach((notification, id) => {
-                    this.remove(id);
-                });
-            }
         }
 
         const notificationSystem = new NotificationSystem();
 
-        window.MiauAPI = {
-            infobox: (message, level, tempo, tamanho, posicao) => {
-                return notificationSystem.infobox(message, level, tempo, tamanho, posicao);
-            }
-        };
-
-        // Exemplos de teste
-        setTimeout(() => {
-            MiauAPI.infobox('Menu injetado com sucesso!', 'success', 6000, 'medium', 'top-right');
-        }, 1000);
-
-        setTimeout(() => {
-            MiauAPI.infobox('Sistema carregado!', 'info', 4000, 'large', 'center');
-        }, 2000);
-
-        setTimeout(() => {
-            MiauAPI.infobox('Atenção: Verifique suas configurações!', 'warn', 5000, 'small', 'bottom-left');
-        }, 3000);
-
-        setTimeout(() => {
-            MiauAPI.infobox('Erro: Não foi possível utilizar esta função!', 'error', 5000, 'medium', 'bottom-right');
-        }, 4000);
-
-        // Comunicação com FiveM DUI
+        // Ouvir mensagens do FiveM
         window.addEventListener('message', function(event) {
-            try {
-                const data = JSON.parse(event.data);
-                
-                if (data.action === 'infobox') {
-                    MiauAPI.infobox(
-                        data.message || 'Notificação',
-                        data.level || 'info',
-                        data.tempo || 5000,
-                        data.tamanho || 'medium',
-                        data.posicao || 'top-right'
-                    );
-                } else if (data.action === 'clearNotifications') {
-                    notificationSystem.clear();
-                }
-            } catch (error) {
-                console.error('Erro ao processar mensagem do FiveM:', error);
+            const data = event.data;
+            if (data.action === 'show') {
+                notificationSystem.show(data.message, data.type, data.duration);
             }
         });
+
+        // Expor globalmente
+        window.notificationSystem = notificationSystem;
+        
+        // Notificar que o HTML está pronto
+        if (window.invokeNative) {
+            window.invokeNative('openUrl', 'https://miaumenu.github.io/MiauAPI/loaded');
+        }
     </script>
 </body>
 </html>
