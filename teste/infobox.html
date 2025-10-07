@@ -2,18 +2,13 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MiauAPI Notificações</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiauAPI Notificações (Vue)</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Inter", sans-serif; }
-
-    body {
-      background: transparent;
-      overflow: hidden;
-      pointer-events: none;
-    }
+    body { background: transparent; overflow: hidden; pointer-events: none; }
 
     .notify-container {
       position: fixed;
@@ -42,90 +37,98 @@
       pointer-events: all;
     }
 
-    .notify.info { background: rgba(0,170,255,0.15); border-color: rgba(0,170,255,0.6); }
-    .notify.sucesso { background: rgba(17,255,0,0.15); border-color: rgba(17,255,0,0.6); }
-    .notify.erro { background: rgba(255,0,0,0.15); border-color: rgba(255,0,0,0.6); }
-    .notify.warning { background: rgba(255,200,0,0.15); border-color: rgba(255,200,0,0.6); }
+    .notify.info     { background: rgba(0,170,255,0.15); border-color: rgba(0,170,255,0.6); }
+    .notify.sucesso  { background: rgba(17,255,0,0.15);  border-color: rgba(17,255,0,0.6); }
+    .notify.erro     { background: rgba(255,0,0,0.15);   border-color: rgba(255,0,0,0.6); }
+    .notify.warning  { background: rgba(255,200,0,0.15); border-color: rgba(255,200,0,0.6); }
 
-    .notify i {
-      font-size: 16px;
-      min-width: 20px;
-      text-align: center;
-    }
-
-    .notify p {
-      font-size: 13px;
-      font-weight: 600;
-      color: #fff;
-      flex: 1;
-    }
+    .notify i { font-size: 16px; min-width: 20px; text-align: center; }
+    .notify p { font-size: 13px; font-weight: 600; color: #fff; flex: 1; }
 
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      to   { transform: translateX(0); opacity: 1; }
     }
 
     @keyframes slideOut {
       from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
+      to   { transform: translateX(100%); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="notify-container" id="notifyContainer"></div>
+  <div id="app">
+    <div class="notify-container">
+      <TransitionGroup name="slide" tag="div">
+        <div v-for="n in notifications"
+             :key="n.id"
+             class="notify"
+             :class="n.level"
+             @click="remove(n.id)">
+          <i>{{ icons[n.level] || "💬" }}</i>
+          <p>{{ n.message }}</p>
+        </div>
+      </TransitionGroup>
+    </div>
+  </div>
 
   <script>
-    const container = document.getElementById("notifyContainer");
+    const { createApp, ref } = Vue;
 
-    // Mapa de ícones por tipo
-    const icons = {
-      info: "ℹ️",
-      sucesso: "✅",
-      erro: "❌",
-      warning: "⚠️"
-    };
+    createApp({
+      setup() {
+        const notifications = ref([]);
+        const icons = {
+          info: "ℹ️",
+          sucesso: "✅",
+          erro: "❌",
+          warning: "⚠️"
+        };
 
-    // Função principal de notificação
-    function showNotification(message, duration = 5000, size = "medium", position = "top-right", level = "info") {
-      const box = document.createElement("div");
-      box.className = `notify ${level}`;
-      box.innerHTML = `<i>${icons[level] || "💬"}</i><p>${message}</p>`;
-      container.appendChild(box);
+        const add = (message, duration = 5000, size = "medium", position = "top-right", level = "info") => {
+          const id = Date.now() + Math.random();
+          notifications.value.push({ id, message, level });
 
-      // Remover após o tempo definido
-      setTimeout(() => {
-        box.style.animation = "slideOut 0.3s ease forwards";
-        setTimeout(() => box.remove(), 300);
-      }, duration);
-    }
+          if (duration > 0) {
+            setTimeout(() => remove(id), duration);
+          }
+        };
 
-    // Expor API global
-    window.MiauAPI = {
-      infobox: (mensagem, tempo = 5000, tamanho = "medium", posicao = "top-right", level = "info") => {
-        showNotification(mensagem, tempo, tamanho, posicao, level);
+        const remove = (id) => {
+          const idx = notifications.value.findIndex(n => n.id === id);
+          if (idx !== -1) {
+            const el = document.querySelector(`[data-v-key="${notifications.value[idx].id}"]`);
+            notifications.value.splice(idx, 1);
+          }
+        };
+
+        // Recebe mensagens do Lua via SendDuiMessage
+        window.addEventListener("message", (event) => {
+          let data = event.data;
+          try {
+            if (typeof data === "string") data = JSON.parse(data);
+          } catch (e) {}
+
+          if (!data || data.action !== "notify") return;
+
+          add(
+            data.message || "Sem mensagem",
+            data.duration || 5000,
+            data.size || "medium",
+            data.position || "top-right",
+            data.level || "info"
+          );
+        });
+
+        // API global
+        window.MiauAPI = {
+          infobox: (msg, dur = 5000, size = "medium", pos = "top-right", level = "info") =>
+            add(msg, dur, size, pos, level)
+        };
+
+        return { notifications, icons, remove };
       }
-    };
-
-    // Receber mensagens do Lua (SendDuiMessage)
-    window.addEventListener("message", (event) => {
-      let data = event.data;
-      try {
-        if (typeof data === "string") data = JSON.parse(data);
-      } catch (e) {}
-
-      if (!data || data.action !== "notify") return;
-
-      showNotification(
-        data.message || "Sem mensagem",
-        data.duration || 5000,
-        data.size || "medium",
-        data.position || "top-right",
-        data.level || "info"
-      );
-    });
-
-    // Exemplo local (para testar direto no navegador)
-    // setTimeout(() => MiauAPI.infobox("Sistema iniciado com sucesso!", 4000, "medium", "top-right", "sucesso"), 1000);
+    }).mount("#app");
   </script>
 </body>
 </html>
