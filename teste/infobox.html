@@ -41,6 +41,46 @@
             overflow: visible;
         }
 
+        /* Posições do container */
+        .notification-container.top-left {
+            top: 20px;
+            left: 20px;
+            right: auto;
+            align-items: flex-start;
+        }
+
+        .notification-container.top-right {
+            top: 20px;
+            right: 20px;
+            left: auto;
+            align-items: flex-end;
+        }
+
+        .notification-container.bottom-left {
+            bottom: 20px;
+            left: 20px;
+            top: auto;
+            right: auto;
+            align-items: flex-start;
+        }
+
+        .notification-container.bottom-right {
+            bottom: 20px;
+            right: 20px;
+            top: auto;
+            left: auto;
+            align-items: flex-end;
+        }
+
+        .notification-container.center {
+            top: 50%;
+            left: 50%;
+            right: auto;
+            bottom: auto;
+            transform: translate(-50%, -50%);
+            align-items: center;
+        }
+
         .notification {
             box-sizing: border-box;
             width: 248px;
@@ -62,6 +102,32 @@
             align-items: center;
             gap: 0;
             padding: 0;
+        }
+
+        /* Tamanhos de notificação */
+        .notification.small {
+            width: 200px;
+            height: 45px;
+        }
+
+        .notification.small .notification-message {
+            font-size: 9px;
+            line-height: 11px;
+        }
+
+        .notification.medium {
+            width: 248px;
+            height: 58px;
+        }
+
+        .notification.large {
+            width: 320px;
+            height: 75px;
+        }
+
+        .notification.large .notification-message {
+            font-size: 12px;
+            line-height: 14px;
         }
 
         .notification-icon-wrapper {
@@ -173,12 +239,17 @@
             constructor() {
                 this.container = document.getElementById('notificationContainer');
                 this.notifications = new Map();
+                this.currentPosition = 'top-right';
+                this.currentSize = 'medium';
             }
 
-            infobox(message, level = 'info', tempo = 5000) {
+            infobox(message, level = 'info', tempo = 5000, tamanho = 'medium', posicao = 'top-right') {
                 const id = Date.now() + Math.random();
                 
-                const notification = this.createNotification(id, message, level);
+                // Atualizar posição do container se necessário
+                this.updateContainerPosition(posicao);
+                
+                const notification = this.createNotification(id, message, level, tamanho);
                 
                 this.container.appendChild(notification);
                 this.notifications.set(id, notification);
@@ -192,9 +263,16 @@
                 return id;
             }
 
-            createNotification(id, message, type) {
+            updateContainerPosition(posicao) {
+                if (posicao !== this.currentPosition) {
+                    this.container.className = `notification-container ${posicao}`;
+                    this.currentPosition = posicao;
+                }
+            }
+
+            createNotification(id, message, type, tamanho = 'medium') {
                 const notification = document.createElement('div');
-                notification.className = `notification ${type}`;
+                notification.className = `notification ${type} ${tamanho}`;
                 notification.dataset.id = id;
 
                 notification.innerHTML = `
@@ -230,10 +308,27 @@
         const notificationSystem = new NotificationSystem();
 
         window.MiauAPI = {
-            infobox: (message, level, tempo) => {
-                return notificationSystem.infobox(message, level, tempo);
+            infobox: (message, level, tempo, tamanho, posicao) => {
+                return notificationSystem.infobox(message, level, tempo, tamanho, posicao);
             }
         };
+
+        // Exemplos de teste
+        setTimeout(() => {
+            MiauAPI.infobox('Menu injetado com sucesso!', 'success', 6000, 'medium', 'top-right');
+        }, 1000);
+
+        setTimeout(() => {
+            MiauAPI.infobox('Sistema carregado!', 'info', 4000, 'large', 'center');
+        }, 2000);
+
+        setTimeout(() => {
+            MiauAPI.infobox('Atenção: Verifique suas configurações!', 'warn', 5000, 'small', 'bottom-left');
+        }, 3000);
+
+        setTimeout(() => {
+            MiauAPI.infobox('Erro: Não foi possível utilizar esta função!', 'error', 5000, 'medium', 'bottom-right');
+        }, 4000);
 
         // Comunicação com FiveM DUI
         window.addEventListener('message', function(event) {
@@ -244,7 +339,9 @@
                     MiauAPI.infobox(
                         data.message || 'Notificação',
                         data.level || 'info',
-                        data.tempo || 5000
+                        data.tempo || 5000,
+                        data.tamanho || 'medium',
+                        data.posicao || 'top-right'
                     );
                 } else if (data.action === 'clearNotifications') {
                     notificationSystem.clear();
