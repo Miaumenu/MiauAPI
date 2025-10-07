@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -28,7 +27,6 @@
             background: transparent;
         }
 
-        /* Container de notificações */
         .notification-container {
             position: fixed;
             top: 20px;
@@ -43,48 +41,8 @@
             overflow: visible;
         }
 
-        /* Posições do container */
-        .notification-container.top-left {
-            top: 20px;
-            left: 20px;
-            right: auto;
-            align-items: flex-start;
-        }
-
-        .notification-container.top-right {
-            top: 20px;
-            right: 20px;
-            left: auto;
-            align-items: flex-end;
-        }
-
-        .notification-container.bottom-left {
-            bottom: 20px;
-            left: 20px;
-            top: auto;
-            right: auto;
-            align-items: flex-start;
-        }
-
-        .notification-container.bottom-right {
-            bottom: 20px;
-            right: 20px;
-            top: auto;
-            left: auto;
-            align-items: flex-end;
-        }
-
-        .notification-container.center {
-            top: 50%;
-            left: 50%;
-            right: auto;
-            bottom: auto;
-            transform: translate(-50%, -50%);
-            align-items: center;
-        }
-
-        /* Estilo das notificações */
         .notification {
+            box-sizing: border-box;
             width: 248px;
             height: 58px;
             background: var(--notification-bg);
@@ -106,32 +64,6 @@
             padding: 0;
         }
 
-        /* Tamanhos de notificação */
-        .notification.small {
-            width: 200px;
-            height: 45px;
-        }
-
-        .notification.small .notification-message {
-            font-size: 9px;
-            line-height: 11px;
-        }
-
-        .notification.medium {
-            width: 248px;
-            height: 58px;
-        }
-
-        .notification.large {
-            width: 320px;
-            height: 75px;
-        }
-
-        .notification.large .notification-message {
-            font-size: 12px;
-            line-height: 14px;
-        }
-
         .notification-icon-wrapper {
             display: flex;
             align-items: center;
@@ -145,10 +77,6 @@
             margin-left: 6px;
         }
 
-        .notification-icon {
-            display: none;
-        }
-
         .notification-content {
             padding: 10px 15px;
             position: relative;
@@ -159,71 +87,47 @@
         }
 
         .notification-message {
-            font-size: 10px;
+            font-family: 'Inter';
+            font-style: normal;
             font-weight: 600;
+            font-size: 10px;
             line-height: 12px;
             letter-spacing: -0.02em;
             color: #FFFFFF;
             word-wrap: break-word;
         }
 
-        .notification-timestamp {
-            display: none;
-        }
-
-        .notification-close {
-            display: none;
-        }
-
-        .notification-progress {
-            display: none;
-        }
-
-        /* Tipos de notificação */
+        /* Tipos de notificação com a camada preta adicionada */
         .notification.info {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(0, 170, 255, 0.1407) 104.72%);
-            --notification-border: rgba(0, 170, 255, 0.61);
-            --notification-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.25);
+            --notification-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.73), rgba(0, 0, 0, 0.73)), linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(0, 170, 255, 0.1407) 104.72%);
+            --notification-border: rgba(0, 170, 255, 0.71);
+            --notification-shadow: 0px 0px 18px 2px rgba(0, 170, 255, 0.25);
             --notification-accent: #00AAFF;
             --notification-accent-shadow: 0px 0px 4px 2px rgba(0, 170, 255, 0.61);
         }
 
         .notification.success {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(17, 255, 0, 0.1407) 104.72%);
-            --notification-border: rgba(17, 255, 0, 0.61);
-            --notification-shadow: 0px 0px 4px rgba(17, 255, 0, 0.25);
+            --notification-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.73), rgba(0, 0, 0, 0.73)), linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(17, 255, 0, 0.1407) 104.72%);
+            --notification-border: rgba(17, 255, 0, 0.71);
+            --notification-shadow: 0px 0px 18px 2px rgba(17, 255, 0, 0.25);
             --notification-accent: #11FF00;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(17, 255, 0, 0.25);
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(17, 255, 0, 0.61);
         }
 
         .notification.warn {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(238, 255, 0, 0.1407) 104.72%);
-            --notification-border: rgba(238, 255, 0, 0.61);
-            --notification-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.25);
+            --notification-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.73), rgba(0, 0, 0, 0.73)), linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(238, 255, 0, 0.1407) 104.72%);
+            --notification-border: rgba(238, 255, 0, 0.71);
+            --notification-shadow: 0px 0px 18px 2px rgba(238, 255, 0, 0.25);
             --notification-accent: #EEFF00;
             --notification-accent-shadow: 0px 0px 4px 2px rgba(238, 255, 0, 0.61);
         }
 
         .notification.error {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 0, 0, 0.1407) 104.72%);
-            --notification-border: rgba(255, 0, 0, 0.61);
-            --notification-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
+            --notification-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.73), rgba(0, 0, 0, 0.73)), linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 0, 0, 0.1407) 104.72%);
+            --notification-border: rgba(255, 0, 0, 0.71);
+            --notification-shadow: 0px 0px 18px 2px rgba(255, 0, 0, 0.25);
             --notification-accent: #FF0000;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.25);
-        }
-
-        .notification.loading {
-            --notification-bg: linear-gradient(97.75deg, rgba(47, 47, 47, 0.1911) -3.82%, rgba(255, 255, 255, 0.1407) 104.72%);
-            --notification-border: rgba(255, 255, 255, 0.61);
-            --notification-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.25);
-            --notification-accent: #FFFFFF;
-            --notification-accent-shadow: 0px 0px 4px 2px rgba(255, 255, 255, 0.61);
-        }
-
-        /* Animações */
-        @keyframes notification-progress {
-            0% { width: 100%; }
-            100% { width: 0%; }
+            --notification-accent-shadow: 0px 0px 4px 2px rgba(255, 0, 0, 0.61);
         }
 
         /* Animação de entrada */
@@ -269,26 +173,18 @@
             constructor() {
                 this.container = document.getElementById('notificationContainer');
                 this.notifications = new Map();
-                this.currentPosition = 'top-right';
-                this.currentSize = 'medium';
             }
 
-            // Função principal MiauAPI.infobox
-            infobox(message, level = 'info', tempo = 5000, tamanho = 'medium', posicao = 'top-right') {
+            infobox(message, level = 'info', tempo = 5000) {
                 const id = Date.now() + Math.random();
                 
-                // Atualizar posição do container se necessário
-                this.updateContainerPosition(posicao);
-                
-                const notification = this.createNotification(id, message, level, tempo, tamanho);
+                const notification = this.createNotification(id, message, level);
                 
                 this.container.appendChild(notification);
                 this.notifications.set(id, notification);
 
-                // Adicionar animação de entrada
                 notification.classList.add('notification-enter');
 
-                // Auto-remover após a duração especificada
                 setTimeout(() => {
                     this.remove(id);
                 }, tempo);
@@ -296,46 +192,19 @@
                 return id;
             }
 
-            // Função de compatibilidade (mantida para retrocompatibilidade)
-            show(message, type = 'info', duration = 5000) {
-                return this.infobox(message, type, duration, this.currentSize, this.currentPosition);
-            }
-
-            updateContainerPosition(posicao) {
-                if (posicao !== this.currentPosition) {
-                    this.container.className = `notification-container ${posicao}`;
-                    this.currentPosition = posicao;
-                }
-            }
-
-            createNotification(id, message, type, duration, tamanho = 'medium') {
+            createNotification(id, message, type) {
                 const notification = document.createElement('div');
-                notification.className = `notification ${type} ${tamanho}`;
+                notification.className = `notification ${type}`;
                 notification.dataset.id = id;
 
-                const icon = this.getIcon(type);
-
                 notification.innerHTML = `
-                    <div class="notification-icon-wrapper">
-                        <i class="${icon} notification-icon"></i>
-                    </div>
+                    <div class="notification-icon-wrapper"></div>
                     <div class="notification-content">
                         <div class="notification-message">${message}</div>
                     </div>
                 `;
 
                 return notification;
-            }
-
-            getIcon(type) {
-                const icons = {
-                    'info': 'fas fa-info-circle',
-                    'success': 'fas fa-check-circle',
-                    'warn': 'fas fa-exclamation-triangle',
-                    'error': 'fas fa-times-circle',
-                    'loading': 'fas fa-spinner'
-                };
-                return icons[type] || icons['info'];
             }
 
             remove(id) {
@@ -358,37 +227,14 @@
             }
         }
 
-        // Inicializar sistema de notificações
         const notificationSystem = new NotificationSystem();
 
-        // Criar objeto MiauAPI global
         window.MiauAPI = {
-            infobox: (message, level, tempo, tamanho, posicao) => {
-                return notificationSystem.infobox(message, level, tempo, tamanho, posicao);
+            infobox: (message, level, tempo) => {
+                return notificationSystem.infobox(message, level, tempo);
             }
         };
 
-        // Exemplos de uso com a nova API
-        setTimeout(() => {
-            MiauAPI.infobox('Menu injetado com sucesso! agora basta configurar qual bind ira abrir o menu.', 'info', 6000, 'medium', 'top-right');
-        }, 1000);
-
-        setTimeout(() => {
-            MiauAPI.infobox('Sistema carregado com sucesso!', 'success', 4000, 'large', 'center');
-        }, 2000);
-
-        setTimeout(() => {
-            MiauAPI.infobox('Atenção: Verifique suas configurações!', 'warn', 5000, 'small', 'bottom-left');
-        }, 3000);
-
-        setTimeout(() => {
-            MiauAPI.infobox('Erro: Não foi possível utilizar esta função!', 'error', 5000, 'medium', 'bottom-right');
-        }, 4000);
-
-        // Expor para uso global (compatibilidade)
-        window.notificationSystem = notificationSystem;
-
-        // Comunicação com FiveM DUI
         window.addEventListener('message', function(event) {
             try {
                 const data = JSON.parse(event.data);
@@ -397,16 +243,7 @@
                     MiauAPI.infobox(
                         data.message || 'Notificação',
                         data.level || 'info',
-                        data.tempo || 5000,
-                        data.tamanho || 'medium',
-                        data.posicao || 'top-right'
-                    );
-                } else if (data.action === 'notify') {
-                    // Compatibilidade com sistema anterior
-                    notificationSystem.show(
-                        data.message || 'Notificação',
-                        data.type || 'info',
-                        data.duration || 5000
+                        data.tempo || 5000
                     );
                 } else if (data.action === 'clearNotifications') {
                     notificationSystem.clear();
